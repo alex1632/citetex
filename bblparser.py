@@ -2,7 +2,7 @@ import re
 
 class BBLParser:
     def __init__(self):
-        self.entry_re = re.compile(r"\\bibitem(?:\[([\w\-_]+)\])?\{([\w\-_]+)\}")
+        self.entry_re = re.compile(r"\\bibitem(?:\[((?:[\w\-_]|{\\etalchar{\+}})+)\])?\{(.+)\}")
 
     def parse_bbl(self, inputstr):
         lines = inputstr.split('\n')
@@ -16,7 +16,7 @@ class BBLParser:
                 entries[current_entry] = dict()
                 entries[current_entry]['block'] = ""
                 if entry_start.groups()[0] is not None:
-                    entries[current_entry]['ref'] = entry_start.groups()[0]
+                    entries[current_entry]['ref'] = entry_start.groups()[0].replace('{\\etalchar{+}}', '+')
 
             elif line in suppressors:
                 continue

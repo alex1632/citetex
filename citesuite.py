@@ -31,7 +31,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, self.properties = self.bibmanager.serve_entry(cite_key)
-            print(self.properties)
+
+            print(cite_key, self.properties, image_path)
             info_content = ""
             if image_path:
                 if "ref" in self.properties:
@@ -59,7 +60,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
             project_settings = project_data['settings'] if(project_data is not None and "settings" in project_data) else {}
             if "bibstyle" in project_settings:
                 self.bibmanager.set_style(project_settings['bibstyle'])
-
             self.errors = self.bibmanager.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
             if self.view.file_name().endswith('.bib'):
                 self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
