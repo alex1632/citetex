@@ -18,7 +18,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
         self.stream.setLevel(logging.INFO)
         self.logger.addHandler(self.stream)
         self.bibmanager = bibmanager.BibManager(self.logger)
-        self.bibmanager.set_style('alpha')
         self.bibphantoms = bibphantoms.BibPhantomManager()
         self.errors = {}
         self.properties = dict()
@@ -32,6 +31,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, self.properties = self.bibmanager.serve_entry(cite_key)
+            print(self.properties)
             info_content = ""
             if image_path:
                 if "ref" in self.properties:
@@ -53,11 +53,13 @@ class HoverCite(sublime_plugin.ViewEventListener):
         self.logger.debug("Scope of view is {}".format(scope))
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
             self.logger.debug("Changed views to {}".format(self.view.file_name()))
-            print(self.view.window().project_data())
+
+            # adjust rendering style to project
             project_data = self.view.window().project_data()
             project_settings = project_data['settings'] if(project_data is not None and "settings" in project_data) else {}
             if "bibstyle" in project_settings:
                 self.bibmanager.set_style(project_settings['bibstyle'])
+
             self.errors = self.bibmanager.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
             if self.view.file_name().endswith('.bib'):
                 self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
