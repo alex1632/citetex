@@ -38,7 +38,7 @@ class BibManager:
 
         if os.path.exists(bblfile):
             with open(bblfile, "r") as bbl:
-                self.bib_entries[os.path.basename(bblfile).rstrip('.bib')] = self.bblparser.parse_bbl(bbl.read())
+                self.bib_entries[bibfile] = self.bblparser.parse_bbl(bbl.read())
         else:
             self.logger.info("File {} does not exist!".format(bblfile))
 
@@ -65,6 +65,8 @@ class BibManager:
                 image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
                 if "ref" in self.bib_entries[bib][key]:
                     properties["ref"] = self.bib_entries[bib][key]["ref"]
+                    properties["bibfile"] = bib
+                    properties["key"] = key
                 break
 
         # print(image_path)
