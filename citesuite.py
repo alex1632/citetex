@@ -22,12 +22,13 @@ class HoverCite(sublime_plugin.ViewEventListener):
         self.bibphantoms = bibphantoms.BibPhantomManager()
         self.errors = {}
         self.properties = dict()
+        self._bib_focus = False # used for "goto BibTex entry", wait until bib file is parsed, then scroll to symbol
 
     def on_hover(self, point, hover_zone):
         # scopes = self.view.scope_name(self.view.sel()[0].begin()).split()
         scopes = self.view.scope_name(point).split()
         if 'text.tex.latex' in scopes and 'constant.other.citation.latex' in scopes:
-            # print("Hovered over cite")
+            
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, self.properties = self.bibmanager.serve_entry(cite_key)
@@ -45,19 +46,28 @@ class HoverCite(sublime_plugin.ViewEventListener):
             bib_view = self.view.window().open_file(self.properties["bibfile"])
             bib_view.show(next(filter(lambda x: x[1] == self.properties['key'], bib_view.symbols()), None)[0])
 
+            
+
     def on_activated_async(self):
         scope = self.view.scope_name(0)
         self.logger.debug("Scope of view is {}".format(scope))
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
             self.logger.debug("Changed views to {}".format(self.view.file_name()))
-
+            print(self.view.window().project_data())
+            project_data = self.view.window().project_data()
+            project_settings = project_data['settings'] if(project_data is not None and "settings" in project_data) else {}
+            if "bibstyle" in project_settings:
+                self.bibmanager.set_style(project_settings['bibstyle'])
             self.errors = self.bibmanager.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
             if self.view.file_name().endswith('.bib'):
                 self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
                 self.logger.debug(self.view.file_name())
                 self.logger.debug(self.errors)
 
+
     def on_post_save_async(self):
         if self.view.file_name().endswith('.bib'):
             self.errors = self.bibmanager.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
             self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
+
+
