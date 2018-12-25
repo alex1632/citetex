@@ -48,3 +48,11 @@ class ReferenceFinder:
             elif label:
                 self.entries.append({"filename": filename, "type": typ, "label": label.groups()[0], "text": text, "params": params})
                 typ, params, text = None, None, None
+
+    def deliver_entries(self):
+        return [["{:55s} [{}]".format(x["text"], os.path.basename(x["filename"])), "{} - {}".format((x["params"] + x["type"]).title(), x["label"])] for x in self.entries]
+
+    def query_entry(self, number):
+        entry = self.entries[number]
+
+        return "{}.~\\ref{{{}}} ".format("Test", entry["label"])
