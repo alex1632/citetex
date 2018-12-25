@@ -5,6 +5,7 @@ import os
 from . import ref_finder
 
 reference_server = ref_finder.ReferenceFinder()
+file_ref_loaded = None
 
 class RefFiller(sublime_plugin.ViewEventListener):
     def __init__(self, *args, **kwargs):
@@ -56,10 +57,32 @@ class RefFiller(sublime_plugin.ViewEventListener):
             if reference_server.rootdir != current_dir:
                 reference_server.update_references(current_dir)
 
+
+
     def on_post_save(self):
         if self.view.file_name().endswith('.tex'):
             print("Updating {}".format(self.view.file_name()))
             reference_server.update_file(self.view.file_name())
+
+# class JumpListener(sublime_plugin.EventListener):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.view = None
+#     def on_load(self, view):
+#         self.view = view
+ 
+#         global file_ref_loaded
+#         print("Now", file_ref_loaded)
+#         # if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
+#         if file_ref_loaded:
+#             entry = reference_server.entries[file_ref_loaded]
+#             print(self.view.symbols(), entry["label"], "async")
+#             region = next(filter(lambda x: x[1] == entry['label'], self.view.symbols()), None)[0]
+#             print(region.a)
+#             self.view.show_at_center(region.a)
+#             file_ref_loaded = None
+
+#         print("Done", file_ref_loaded)
 
 
 class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
@@ -72,5 +95,20 @@ class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
                                                                   default_settings,
                                                                   self.view.window().project_data()))
 
-# class TexcuiteGotoLabelCommand(sublime_plugin.WindowCommand):
-#     def run()
+class TexcuiteGotoLabelCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        self.window.show_quick_panel(reference_server.deliver_entries(), self.on_apply_selection)
+
+    def on_apply_selection(self, sel):
+        global file_ref_loaded
+        entry = reference_server.entries[sel]
+        tex_view = self.window.open_file(entry["filename"])
+        if tex_view.is_loading():
+            # file_ref_loaded = sel
+            pass
+        else:
+            print(tex_view.symbols(), entry["label"])
+            print(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0])
+            tex_view.show_at_center(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0].a)
+
+        

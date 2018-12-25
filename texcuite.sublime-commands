@@ -3,5 +3,6 @@
 	{"caption": "TeXCuite: Enable error display in bibfile", "command": "texcuite_handle_config", 
 		"args": {"entry": "bib_errors", "param": true}},
 	{"caption": "TeXCuite: Disable error display in bibfile", "command": "texcuite_handle_config", 
-		"args": {"entry": "bib_errors", "param": false}}
+		"args": {"entry": "bib_errors", "param": false}},
+	{"caption": "TeXCuite: Go to label", "command": "texcuite_goto_label"}
 ]
