@@ -10,6 +10,7 @@ class RefFiller(sublime_plugin.ViewEventListener):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.region = None
+        self.entry = None
 
     def on_query_context(self, key, operator, operand, match_all):
         if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
@@ -31,13 +32,18 @@ class RefFiller(sublime_plugin.ViewEventListener):
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             ref_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
 
-            entry = reference_server.query_popup(ref_key)
-            if entry:
+            self.entry = reference_server.query_popup(ref_key)
+            if self.entry:
                 info_content = ""
-                info_content += "<h3>{}</h3>\n".format(html.escape(entry["text"]))
-                info_content += "<p>[{}] in {}</p>\n".format(entry["type"].title(), os.path.basename(entry["filename"]))
+                info_content += "<h3>{}</h3>\n".format(html.escape(self.entry["text"]))
+                info_content += '<p>[{}] in {} - <a href="definition">Go to Definition</a></p>\n'.format(self.entry["type"].title(), os.path.basename(self.entry["filename"]))
                 
-                self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800)
+                self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self._handle_popup)
+    
+    def _handle_popup(self, command):
+        if command == "definition":
+            tex_view = self.view.window().open_file(self.entry["filename"])
+            tex_view.show(next(filter(lambda x: x[1] == self.entry['label'], tex_view.symbols()), None)[0])
 
 
     def on_apply_selection(self, number):
