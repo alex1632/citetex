@@ -50,6 +50,16 @@ class RefFiller(sublime_plugin.ViewEventListener):
         if number != -1:
             self.view.run_command("texcuite_apply_ref", {"number": number})              
 
+    def on_activated(self):
+        if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
+            current_dir = os.path.dirname(self.view.file_name())
+            if reference_server.rootdir != current_dir:
+                reference_server.update_references(current_dir)
+
+    def on_post_save(self):
+        if self.view.file_name().endswith('.tex'):
+            print("Updating {}".format(self.view.file_name()))
+            reference_server.update_file(self.view.file_name())
 
 
 class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
@@ -62,15 +72,5 @@ class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
                                                                   default_settings,
                                                                   self.view.window().project_data()))
 
-
-class ReferenceWatchdog(sublime_plugin.ViewEventListener):
-    def on_activated(self):
-        if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
-            current_dir = os.path.dirname(self.view.file_name())
-            if reference_server.rootdir != current_dir:
-                reference_server.update_references(current_dir)
-
-    def on_post_save(self):
-        if self.view.file_name().endswith('.tex'):
-            print("Updating {}".format(self.view.file_name()))
-            reference_server.update_file(self.view.file_name())
+# class TexcuiteGotoLabelCommand(sublime_plugin.WindowCommand):
+#     def run()

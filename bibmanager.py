@@ -3,11 +3,10 @@ from . import tex_interface
 from . import bblparser
 
 class BibManager:
-    def __init__(self, logger):
-        self.logger = logger
+    def __init__(self):
         self.style = "IEEEtran"
         self.bib_entries = dict()
-        self.tex_interface = tex_interface.TeXRenderer(self.logger)
+        self.tex_interface = tex_interface.TeXRenderer()
         self.bblparser = bblparser.BBLParser()
 
     def set_style(self, style):
@@ -17,7 +16,6 @@ class BibManager:
         bibfiles = None
         if buffer_name: # file exists on disk
             env = os.path.dirname(buffer_name)
-            self.logger.debug("Env is: {}".format(env))
         else:
             return None # we shouldn't end up here
 
@@ -29,7 +27,6 @@ class BibManager:
             candidates = list(filter(lambda x: x.endswith('.bib'), os.listdir(env)))
             if candidates:
                 bibfiles = [os.path.join(env, x) for x in candidates]
-        self.logger.debug("Bibfile(s) are: {}".format(bibfiles))
         return bibfiles
 
 
@@ -39,8 +36,6 @@ class BibManager:
         if os.path.exists(bblfile):
             with open(bblfile, "r") as bbl:
                 self.bib_entries[bibfile] = self.bblparser.parse_bbl(bbl.read())
-        else:
-            self.logger.info("File {} does not exist!".format(bblfile))
 
         return errors
 
@@ -50,7 +45,6 @@ class BibManager:
         bibfiles = self.detect_environment(project_data, buffer_name)
 
         for bibfile in bibfiles:
-            self.logger.debug("Loading file: {}".format(bibfile))
             err = self.reload_bibfile(bibfile)
             errors[bibfile] = err
 

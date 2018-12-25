@@ -21,8 +21,8 @@ aux_skeleton = r"""
 """
 
 class TeXRenderer:
-    def __init__(self, logger, tex="latex", bibinterface="bibtex", cwd="/tmp"):
-        self.logger = logger
+    def __init__(self, tex="latex", bibinterface="bibtex", cwd="/tmp"):
+
         self.texcommand = tex
         self.cwd = cwd
         self.bibinterface = bibinterface
@@ -33,10 +33,10 @@ class TeXRenderer:
 
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)
-        tex_cmd = subprocess.Popen("{} -jobname cite".format(self.texcommand), cwd=self.cwd, stdin=subprocess.PIPE, shell=True)
+        tex_cmd = subprocess.Popen("{} -jobname cite".format(self.texcommand), cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
         tex_cmd.communicate(input=document.encode())
         tex_cmd.wait()
-        subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "cite.dvi"]), cwd=self.cwd, shell=True).wait()
+        subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "cite.dvi"]), cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
 
         return os.path.join(self.cwd, "cite1.png")
 
@@ -47,7 +47,6 @@ class TeXRenderer:
             caux.write(aux_skeleton.format(style=style, bibl=bibfile.rstrip('.bib')))
         bibtex_proc = subprocess.Popen("{} {}".format(self.bibinterface, self.AUXFILE_PREFIX + ".aux"), cwd=self.cwd, shell=True, stdout=subprocess.PIPE)
         bibtex_stdout = bibtex_proc.communicate()
-        self.logger.debug(bibtex_stdout[0].decode())
         errors = self.parse_bibtex_errors(bibtex_stdout[0].decode())
 
         return os.path.join(self.cwd, self.AUXFILE_PREFIX + ".bbl"), errors

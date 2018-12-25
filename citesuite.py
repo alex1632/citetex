@@ -12,12 +12,7 @@ from . import bibphantoms
 class HoverCite(sublime_plugin.ViewEventListener):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger = logging.getLogger()
-        # self.logger.setLevel(logging.DEBUG)
-        self.stream = logging.StreamHandler()
-        self.stream.setLevel(logging.INFO)
-        self.logger.addHandler(self.stream)
-        self.bibmanager = bibmanager.BibManager(self.logger)
+        self.bibmanager = bibmanager.BibManager()
         self.bibphantoms = bibphantoms.BibPhantomManager()
         self.errors = dict()
         self.properties = dict()
@@ -57,9 +52,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
     def on_activated_async(self):
         self.use_settings() # since we use settings, reload them
         scope = self.view.scope_name(0)
-        self.logger.debug("Scope of view is {}".format(scope))
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
-            self.logger.debug("Changed views to {}".format(self.view.file_name()))
 
             # adjust rendering style to project
             project_data = self.view.window().project_data()
@@ -73,8 +66,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if self.view.file_name().endswith('.bib'):
                 if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
                     self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
-                    self.logger.debug(self.view.file_name())
-                    self.logger.debug(self.errors)
                 else:
                     self.bibphantoms.clear_phantoms()
 
