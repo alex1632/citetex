@@ -88,6 +88,9 @@ class BibPhantomManager:
 
     def _handle_phantom_link(self, href):
         if href == "hide":
-            self._phantoms = list()
-            self._phantomset.update([])
+            self.clear_phantoms()
+
+    def clear_phantoms(self):
+        self._phantoms = list()
+        self._phantomset.update(self._phantoms)
 

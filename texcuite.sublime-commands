@@ -1,0 +1,7 @@
+[
+	{"caption": "TeXCuite: Set bibliography style", "command": "texcuite_set_bibstyle"},
+	{"caption": "TeXCuite: Enable error display in bibfile", "command": "texcuite_handle_config", 
+		"args": {"entry": "bib_errors", "param": true}},
+	{"caption": "TeXCuite: Disable error display in bibfile", "command": "texcuite_handle_config", 
+		"args": {"entry": "bib_errors", "param": false}}
+]
