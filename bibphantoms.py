@@ -92,5 +92,6 @@ class BibPhantomManager:
 
     def clear_phantoms(self):
         self._phantoms = list()
-        self._phantomset.update(self._phantoms)
+        if self._phantomset:
+            self._phantomset.update(self._phantoms)
 
