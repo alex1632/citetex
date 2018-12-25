@@ -49,15 +49,17 @@ class ReferenceFinder:
 
     def query_entry(self, number, user_settings, default_settings, local_settings):
         entry = self.entries[number]
-        config_user = user_settings.get("references") if "references" not in local_settings else local_settings["references"]
+        config_user = local_settings["settings"]["references"] if \
+         "settings" in local_settings and "references" in local_settings["settings"] \
+         else user_settings.get("references")
         config_default = default_settings.get("references")
 
-        print(config_user, config_default)
         locale = config_user["locale"] if (config_user is not None and "locale" in config_user) else config_default["locale"]
-        print(locale)
-        try:
-            abbrv = config_user["locales"][locale][entry["type"]] if (config_user is not None and "locale" in config_user) else config_default["locales"][locale][entry["type"]]
 
+        try:
+            locale_dict = config_user["locales"][locale] if (config_user is not None and "locales" in config_user) else config_default["locales"][locale]
+
+            abbrv = locale_dict[entry["type"]]
             return "{}~\\ref{{{}}} ".format(abbrv, entry["label"])
         except KeyError:
             print("Could not find definition for {} in locale {}".format(entry["type"], locale))
