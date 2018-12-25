@@ -35,8 +35,13 @@ class RefFiller(sublime_plugin.ViewEventListener):
 class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
     def run(self, edit, number):
         if number != -1:
+            default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
+            user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
             exp = self.view.word(self.view.sel()[0])
-            self.view.replace(edit, exp, reference_server.query_entry(number))
+            self.view.replace(edit, exp, reference_server.query_entry(number,
+                                                                      user_settings,
+                                                                      default_settings,
+                                                                      self.view.window().project_data()))
 
 
 class ReferenceWatchdog(sublime_plugin.ViewEventListener):

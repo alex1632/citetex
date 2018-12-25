@@ -15,14 +15,9 @@ class ReferenceFinder:
 
         for file in os.listdir(self.rootdir):
             if os.path.isfile(os.path.join(self.rootdir, file)) and file.endswith(".tex"):
-                print(self.rootdir, file)
                 self.find_labels(os.path.join(self.rootdir, file))
 
-
-        print(self.entries)
-
     def find_labels(self, filename):
-        print(filename)
         with open(filename, "r") as texfile:
             content = texfile.read().split('\n')
 
@@ -52,7 +47,17 @@ class ReferenceFinder:
     def deliver_entries(self):
         return [["{:55s} [{}]".format(x["text"], os.path.basename(x["filename"])), "{} - {}".format((x["params"] + x["type"]).title(), x["label"])] for x in self.entries]
 
-    def query_entry(self, number):
+    def query_entry(self, number, user_settings, default_settings, local_settings):
         entry = self.entries[number]
+        config_user = user_settings.get("references") if "references" not in local_settings else local_settings["references"]
+        config_default = default_settings.get("references")
 
-        return "{}.~\\ref{{{}}} ".format("Test", entry["label"])
+        print(config_user, config_default)
+        locale = config_user["locale"] if (config_user is not None and "locale" in config_user) else config_default["locale"]
+        print(locale)
+        try:
+            abbrv = config_user["locales"][locale][entry["type"]] if (config_user is not None and "locale" in config_user) else config_default["locales"][locale][entry["type"]]
+
+            return "{}~\\ref{{{}}} ".format(abbrv, entry["label"])
+        except KeyError:
+            print("Could not find definition for {} in locale {}".format(entry["type"], locale))

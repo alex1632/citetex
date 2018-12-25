@@ -1,3 +1,24 @@
 {
-	"bib_errors": true
+	"bib_errors": true,
+
+	"references": {
+		"locale": "en",
+		"locales": {
+			"de": {
+				"figure": "Abb.",
+				"table": "Tab.",
+				"section": "Kap.",
+				"chapter": "Kap.",
+				"equation": "Gl."
+			},
+			"en": {
+				"figure": "Fig.",
+				"table": "Tab.",
+				"section": "Sec.",
+				"chapter": "Ch.",
+				"equation": "Eq."	
+			}
+
+		}
+	}
 }
