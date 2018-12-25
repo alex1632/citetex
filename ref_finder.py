@@ -5,9 +5,9 @@ class ReferenceFinder:
     def __init__(self):
         self.entries = list()
         self.rootdir = None
-        self._titles_re = re.compile(r"\\((?:sub){,2})(section|chapter|caption){(.*)}")
-        self._scope_re = re.compile(r"\\(begin|end){(figure|table|equation)}")
-        self._label_re = re.compile(r"\\label{(.*)}")
+        self._titles_re = re.compile(r"\s*\\((?:sub){,2})(part|section|chapter|(?:foot)?caption)(?:\[.*\])?{(.*)}")
+        self._scope_re = re.compile(r"\s*\\(begin|end){(figure|table|equation)}")
+        self._label_re = re.compile(r"\s*\\label{(.*)}")
 
     def update_references(self, rootdir):
         self.rootdir = rootdir
@@ -16,6 +16,10 @@ class ReferenceFinder:
         for file in os.listdir(self.rootdir):
             if os.path.isfile(os.path.join(self.rootdir, file)) and file.endswith(".tex"):
                 self.find_labels(os.path.join(self.rootdir, file))
+
+    def update_file(self, filename):
+        self.entries = list(filter(lambda x: x != filename, self.entries))
+        self.find_labels(filename)
 
     def find_labels(self, filename):
         with open(filename, "r") as texfile:
@@ -41,11 +45,12 @@ class ReferenceFinder:
                 params = title.groups()[0]
 
             elif label:
-                self.entries.append({"filename": filename, "type": typ, "label": label.groups()[0], "text": text, "params": params})
+                self.entries.append({"filename": filename, "type": typ if not None else "", "label": label.groups()[0], "text": text, "params": params})
                 typ, params, text = None, None, None
 
+
     def deliver_entries(self):
-        return [["{:55s} [{}]".format(x["text"], os.path.basename(x["filename"])), "{} - {}".format((x["params"] + x["type"]).title(), x["label"])] for x in self.entries]
+        return [["{}".format(x["text"]), "{} {} - {}".format((x["params"] + x["type"]).title(), x["label"], os.path.basename(x["filename"]))] for x in self.entries]
 
     def query_entry(self, number, user_settings, default_settings, local_settings):
         entry = self.entries[number]
@@ -63,3 +68,6 @@ class ReferenceFinder:
             return "{}~\\ref{{{}}} ".format(abbrv, entry["label"])
         except KeyError:
             print("Could not find definition for {} in locale {}".format(entry["type"], locale))
+
+    def query_popup(self, key):
+        return next(filter(lambda x: x["label"] == key, self.entries), None)

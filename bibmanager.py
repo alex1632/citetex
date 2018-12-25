@@ -61,7 +61,6 @@ class BibManager:
         image_path = None
         # print(key)
         for bib in self.bib_entries:
-            print(list(self.bib_entries[bib].keys()))
             if key in self.bib_entries[bib]:
                 image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
                 if "ref" in self.bib_entries[bib][key]:
