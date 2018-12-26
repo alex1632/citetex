@@ -53,7 +53,6 @@ class BibManager:
     def serve_entry(self, key):
         properties = dict()
         image_path = None
-        # print(key)
         for bib in self.bib_entries:
             if key in self.bib_entries[bib]:
                 image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
@@ -64,7 +63,6 @@ class BibManager:
                 properties["key"] = key
                 break
 
-        # print(image_path)
         return image_path, properties
 
 

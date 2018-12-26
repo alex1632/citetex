@@ -15,6 +15,7 @@ class TexcuiteSetBibstyleCommand(sublime_plugin.WindowCommand):
             project_data["settings"]["bibstyle"] = self._selections[selection]
         else:
             project_data["settings"] = {}
+            project_data["settings"]["bibstyle"] = self._selections[selection]
         self.window.set_project_data(project_data)
 
 class TexcuiteHandleConfigCommand(sublime_plugin.ApplicationCommand):

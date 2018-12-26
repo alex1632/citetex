@@ -2,8 +2,8 @@ import sublime
 import sublime_plugin
 import html
 import os
-from . import ref_finder
 from threading import Lock
+from . import ref_finder
 
 reference_server = ref_finder.ReferenceFinder()
 file_ref_loaded = None
@@ -20,19 +20,15 @@ class RefFiller(sublime_plugin.ViewEventListener):
             prefix = self.view.substr(self.view.word(self.view.sel()[0].b))
             if prefix == "ref":
                 self.view.window().show_quick_panel(reference_server.deliver_entries(), self.on_apply_selection)
-
                 return False
 
             return None
-
         return None
 
     def on_hover(self, point, hover_zone):
         # scopes = self.view.scope_name(self.view.sel()[0].begin()).split()
         scopes = self.view.scope_name(point).split()
         if 'text.tex.latex' in scopes and 'constant.other.reference.latex' in scopes:
-            
-            # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             ref_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
 
             self.entry = reference_server.query_popup(ref_key)
@@ -46,7 +42,7 @@ class RefFiller(sublime_plugin.ViewEventListener):
     def _handle_popup(self, command):
         if command == "definition":
             tex_view = self.view.window().open_file(self.entry["filename"])
-            tex_view.show(next(filter(lambda x: x[1] == self.entry['label'], tex_view.symbols()), None)[0])
+            tex_view.show(next(filter(lambda x: x[1] == self.entry['label'], tex_view.symbols()), (None, ))[0])
 
 
     def on_apply_selection(self, number):
@@ -79,7 +75,7 @@ class JumpListener(sublime_plugin.EventListener):
             if file_ref_loaded:
                 entry = reference_server.entries[file_ref_loaded]
                 # print(self.view.symbols(), entry["label"], "async")
-                region = next(filter(lambda x: x[1] == entry['label'], self.view.symbols()), None)[0]
+                region = next(filter(lambda x: x[1] == entry['label'], self.view.symbols()), (None, ))[0]
                 self.view.show_at_center(region.a)
                 file_ref_loaded = None
 

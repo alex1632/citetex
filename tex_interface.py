@@ -22,7 +22,6 @@ aux_skeleton = r"""
 
 class TeXRenderer:
     def __init__(self, tex="latex", bibinterface="bibtex", cwd="/tmp"):
-
         self.texcommand = tex
         self.cwd = cwd
         self.bibinterface = bibinterface
@@ -53,8 +52,7 @@ class TeXRenderer:
 
     def parse_bibtex_errors(self, bibtex_out):
         errors = list()
-
-        # It seems like error lines have to be divided by 2 -- WHY?
+        # It seems like error lines have to be divided by 2 in case of errors -- WHY?
         for e in self._re_bibtex_error.findall(bibtex_out):
             errors.append({"level": "ERROR", "line": int(e[1]) // 2, "type": e[0], "file": e[2]})
 

@@ -8,6 +8,7 @@ class ReferenceFinder:
         self._titles_re = re.compile(r"\s*\\((?:sub){,2})(part|section|chapter|(?:foot)?caption)(?:\[.*\])?{(.*)}")
         self._scope_re = re.compile(r"\s*\\(begin|end){(figure|table|equation)}")
         self._label_re = re.compile(r"\s*\\label{(.*)}")
+        self._listing_re = re.compile(r"(?:.*?(caption|label)=(.*?)(?:,|\]))")
 
     def update_references(self, rootdir):
         self.rootdir = rootdir
@@ -30,6 +31,7 @@ class ReferenceFinder:
             label = self._label_re.match(line)
             scope = self._scope_re.match(line)
             title = self._titles_re.match(line)
+            listing = self._listing_re.findall(line)
 
             if scope:
                 context = scope.groups()[0]
@@ -46,6 +48,12 @@ class ReferenceFinder:
 
             elif label:
                 self.entries.append({"filename": filename, "type": typ if not None else "", "label": label.groups()[0], "text": text, "params": params})
+                typ, params, text = None, None, None
+
+            if listing:
+                text = next(filter(lambda x: x[0] == "caption", listing), (None, None))[1]
+                label = next(filter(lambda x: x[0] == "label", listing), (None, None))[1]
+                self.entries.append({"filename": filename, "type": "listing", "label": label, "text": text, "params": ''})
                 typ, params, text = None, None, None
 
 

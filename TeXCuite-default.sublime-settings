@@ -9,14 +9,16 @@
 				"table": "Tab.",
 				"section": "Kap.",
 				"chapter": "Kap.",
-				"equation": "Gl."
+				"equation": "Gl.",
+				"listing": "Lst."
 			},
 			"en": {
 				"figure": "Fig.",
 				"table": "Tab.",
 				"section": "Sec.",
 				"chapter": "Ch.",
-				"equation": "Eq."	
+				"equation": "Eq.",
+				"listing": "Lst."
 			}
 
 		}

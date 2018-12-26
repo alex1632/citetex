@@ -1,16 +1,12 @@
+from threading import Lock
 import sublime
 import sublime_plugin
-import json
-from os.path import join as path_join
-from os.path import basename as basename
-import re
-import logging
+
 from . import bibmanager
 from . import bibphantoms
-from threading import Lock
-
 
 class HoverCite(sublime_plugin.ViewEventListener):
+    # these cannot be per-instance since focusing on file load would not work.
     bibman = bibmanager.BibManager()
     bibphan = bibphantoms.BibPhantomManager()
     LOAD_PENDING = None
@@ -30,10 +26,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
 
 
     def on_hover(self, point, hover_zone):
-        # scopes = self.view.scope_name(self.view.sel()[0].begin()).split()
         scopes = self.view.scope_name(point).split()
         if 'text.tex.latex' in scopes and 'constant.other.citation.latex' in scopes:
-            
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
@@ -59,7 +53,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
     def on_load_async(self):
         with HoverCite.mutex:
             if HoverCite.LOAD_PENDING and "text.biblatex" in self.view.scope_name(self.view.sel()[0].a).split():
-
                 self.view.show_at_center(next(filter(lambda x: x[1] == HoverCite.current_properties['key'], self.view.symbols()), None)[0])
                 HoverCite.LOAD_PENDING = None
             
@@ -84,11 +77,9 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 else:
                     HoverCite.bibphan.clear_phantoms()
 
-
-
     def on_post_save_async(self):
-        self.use_settings()
         if self.view.file_name().endswith('.bib'):
+            self.use_settings()
             if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
                 self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
                 self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
