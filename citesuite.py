@@ -7,19 +7,23 @@ import re
 import logging
 from . import bibmanager
 from . import bibphantoms
+from threading import Lock
 
 
 class HoverCite(sublime_plugin.ViewEventListener):
+    bibman = bibmanager.BibManager()
+    bibphan = bibphantoms.BibPhantomManager()
+    LOAD_PENDING = None
+    mutex = Lock()
+    current_properties = dict()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.bibmanager = bibmanager.BibManager()
-        self.bibphantoms = bibphantoms.BibPhantomManager()
         self.errors = dict()
-        self.properties = dict()
 
         self._default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
         self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
-        self.bibmanager.set_style("IEEEtran")
+        HoverCite.bibman.set_style("IEEEtran")
 
     def use_settings(self):
         self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
@@ -32,21 +36,32 @@ class HoverCite(sublime_plugin.ViewEventListener):
             
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
-            image_path, self.properties = self.bibmanager.serve_entry(cite_key)
+            image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
 
             info_content = ""
             if image_path:
-                if "ref" in self.properties:
-                    info_content += "<h3>[{}]</h3>\n".format(self.properties["ref"])
+                if "ref" in HoverCite.current_properties:
+                    info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
                 info_content += """<p><img src="file://{}"></p>\n""".format(image_path)
                 info_content += """<a href="gotobib">BibTeX entry</a>"""
                 self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
 
     def handle_popup(self, command):
         if command == "gotobib":
-            bib_view = self.view.window().open_file(self.properties["bibfile"])
-            bib_view.show(next(filter(lambda x: x[1] == self.properties['key'], bib_view.symbols()), None)[0])
+            bib_view = self.view.window().open_file(HoverCite.current_properties["bibfile"])
+            if bib_view.is_loading():
+                with HoverCite.mutex:
+                    HoverCite.LOAD_PENDING = True
+            else:
+                marker = next(filter(lambda x: x[1] == HoverCite.current_properties['key'], bib_view.symbols()), None)[0]
+                bib_view.show_at_center(marker)
 
+    def on_load_async(self):
+        with HoverCite.mutex:
+            if HoverCite.LOAD_PENDING and "text.biblatex" in self.view.scope_name(self.view.sel()[0].a).split():
+
+                self.view.show_at_center(next(filter(lambda x: x[1] == HoverCite.current_properties['key'], self.view.symbols()), None)[0])
+                HoverCite.LOAD_PENDING = None
             
 
     def on_activated_async(self):
@@ -59,15 +74,15 @@ class HoverCite(sublime_plugin.ViewEventListener):
             project_settings = project_data['settings'] if(project_data is not None and "settings" in project_data) else {}
             
             if "bibstyle" in project_settings:
-                self.bibmanager.set_style(project_settings['bibstyle'])
+                HoverCite.bibman.set_style(project_settings['bibstyle'])
             
-            self.errors = self.bibmanager.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
+            self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
 
             if self.view.file_name().endswith('.bib'):
                 if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
-                    self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
+                    HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
                 else:
-                    self.bibphantoms.clear_phantoms()
+                    HoverCite.bibphan.clear_phantoms()
 
 
 
@@ -75,7 +90,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
         self.use_settings()
         if self.view.file_name().endswith('.bib'):
             if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
-                self.errors = self.bibmanager.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
+                self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
                 self.bibphantoms.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
 
 
