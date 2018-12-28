@@ -31,7 +31,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
-
+            print(image_path)
             info_content = ""
             if image_path:
                 if "ref" in HoverCite.current_properties:
