@@ -59,7 +59,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
             
 
     def on_activated_async(self):
-        path_of_file = os.path.dirname(self.view.file_name())
+        file_name = self.view.file_name()
+        path_of_file = os.path.dirname(file_name) if file_name else None
         scope = self.view.scope_name(0)
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
             if path_of_file != HoverCite.current_path:

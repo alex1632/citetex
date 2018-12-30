@@ -23,7 +23,7 @@ class ReferenceFinder:
         self.find_labels(filename)
 
     def find_labels(self, filename):
-        with open(filename, "r") as texfile:
+        with open(filename, "r", encoding="utf-8") as texfile:
             content = texfile.read().split('\n')
 
         typ, params, text = None, None, None
