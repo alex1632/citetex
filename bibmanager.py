@@ -34,8 +34,10 @@ class BibManager:
         bblfile, errors = self.tex_interface.generate_bbl(self.style, bibfile)
 
         if os.path.exists(bblfile):
-            with open(bblfile, "r") as bbl:
-                self.bib_entries[bibfile] = self.bblparser.parse_bbl(bbl.read())
+            with open(bblfile, "r", encoding="utf-8") as bbl:
+                content = bbl.read()
+                self.bib_entries[bibfile] = self.bblparser.parse_bbl(content)
+
 
         return errors
 
