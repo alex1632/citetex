@@ -40,8 +40,10 @@ Testers on Mac and Windows are welcome! (I will not put too much effort in getti
 ### Dependencies
 This plugin relies on LaTeX and BibTeX for rendering and handling tex files. Specifically, `latex` and `dvipng` should be availiable in your `PATH`. Other than that, no special python packages or executables are required.
 
+Mac users have to specify the path to the BibTeX style files (`.bst`) in the `bstpath` setting.
+
 ### Temporary files
-For now, TeXCuite is configured by hard to use `/tmp` for temporarily generated files such as `.bbl` outputs of `BibTeX` or rendered versions of citations. Make sure Sublime Text may write to `/tmp`.
+TeXCuite uses the sublime text cache folder. You can, however, change the path by overriding the `cache_path` setting, e.g. for performance reasons.
 
 ### Using the Package
 For now, TeXCuite is not in Package Control. I aim to change this, though. For now it is best to clone this repository, and put a symlink into your `.config/sublime-text-3/Packages/` folder (bad luck for Windows users, you have to copy or clone it there):

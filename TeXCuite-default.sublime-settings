@@ -7,7 +7,7 @@
 
 		},
 		"osx": {
-			"bstpath": ""
+			"bstpath": "/usr/local/texlive/2018/texmf-dist/bibtex/bst/"
 		}
 
 	},
