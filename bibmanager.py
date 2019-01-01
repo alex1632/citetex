@@ -1,3 +1,4 @@
+import sublime
 import os
 from . import tex_interface
 from . import bblparser
@@ -6,7 +7,8 @@ class BibManager:
     def __init__(self):
         self.style = "IEEEtran"
         self.bib_entries = dict()
-        self.tex_interface = tex_interface.TeXRenderer()
+        self._settings_u = sublime.load_settings("TeXCuite-user.sublime-settings")
+        self.tex_interface = tex_interface.TeXRenderer(cwd=self._settings_u.get("cache_path", sublime.cache_path()))
         self.bblparser = bblparser.BBLParser()
 
     def set_style(self, style):

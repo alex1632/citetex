@@ -1,3 +1,5 @@
+import sublime
+import sublime_plugin
 import subprocess
 import os
 import re
@@ -30,6 +32,9 @@ class TeXRenderer:
         self._re_bibtex_warning1 = re.compile(r"Warning--(.*?) in (.*)")
         self._re_bibtex_warning2 = re.compile(r"Warning--(.*?)\n--line (\d+)", re.MULTILINE)
         self._env = os.environ.copy()
+        self._settings = sublime.load_settings("TeXCuite-default.sublime-settings")
+        self._settings_u = sublime.load_settings("TeXCuite-user.sublime-settings")
+        print(sublime.cache_path())
 
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)
@@ -44,6 +49,10 @@ class TeXRenderer:
     def generate_bbl(self, style, bibfile):
         # BSINPUTS, BIBINPUTS variable!! --> bst files
         self._env["BSTINPUTS"] = os.path.dirname(bibfile)
+        bstsettings = self._settings_u.get("bibtex", self._settings.get("bibtex"))
+        if "bstpath" in bstsettings[sublime.platform()]:
+            self._env["BSTINPUTS"] += ";" + bstsettings[sublime.platform()]["bstpath"]
+
         with open(os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"), "w") as caux:
             caux.write(aux_skeleton.format(style=style, bibl=bibfile.rstrip('.bib')))
         bibtex_proc = subprocess.Popen("{} {}".format(self.bibinterface, self.AUXFILE_PREFIX + ".aux"), cwd=self.cwd, shell=True, stdout=subprocess.PIPE, env=self._env)

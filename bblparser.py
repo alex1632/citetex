@@ -2,7 +2,7 @@ import re
 
 class BBLParser:
     def __init__(self):
-        self.entry_re = re.compile(r"\\bibitem(?:\[((?:[\w\-_]|{\\etalchar{\+}})+)\])?\{(.+)\}")
+        self.entry_re = re.compile(r"\\bibitem(?:\[((?:[\w\-_{}]|{\\etalchar{\+}})+)\])?\{(.+)\}")
 
     def parse_bbl(self, inputstr):
         lines = inputstr.split('\n')

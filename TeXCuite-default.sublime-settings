@@ -1,5 +1,18 @@
 {
 	"bib_errors": true,
+	"bibtex": {
+		"linux": {
+		},
+		"windows": {
+
+		},
+		"osx": {
+			"bstpath": ""
+		}
+
+	},
+	// specify this in you user settings to override sublime text's default cache path
+	"cache_path": "",
 
 	"references": {
 		"locale": "en",
