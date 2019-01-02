@@ -39,7 +39,7 @@ class TeXRenderer:
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)
         tex_cmd = subprocess.Popen("{} -jobname cite".format(self.texcommand), cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
-        output = tex_cmd.communicate(input=document.encode())
+        tex_cmd.communicate(input=document.encode())
         tex_cmd.wait()
         subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "cite.dvi"]), cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
 
@@ -50,7 +50,8 @@ class TeXRenderer:
         # BSINPUTS, BIBINPUTS variable!! --> bst files
         self._env["BSTINPUTS"] = os.path.dirname(bibfile)
         bstsettings = self._settings_u.get("bibtex", self._settings.get("bibtex"))
-        if "bstpath" in bstsettings[sublime.platform()]:
+        print("bstsettings:" + str(bstsettings))
+        if bstsettings and "bstpath" in bstsettings[sublime.platform()]:
             self._env["BSTINPUTS"] += ";" + bstsettings[sublime.platform()]["bstpath"]
 
         with open(os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"), "w") as caux:

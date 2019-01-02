@@ -20,7 +20,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
 
         self._default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
         self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
-        HoverCite.bibman.set_style("IEEEtran")
+        HoverCite.bibman.set_style("alpha")
 
     def use_settings(self):
         self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
