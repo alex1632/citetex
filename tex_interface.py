@@ -23,9 +23,9 @@ aux_skeleton = r"""
 """
 
 class TeXRenderer:
-    def __init__(self, tex="latex", bibinterface="bibtex", cwd="/tmp"):
+    def __init__(self, tex="latex", bibinterface="bibtex"):
         self.texcommand = tex
-        self.cwd = cwd
+        self.cwd = None
         self.bibinterface = bibinterface
         self.AUXFILE_PREFIX = "cite"
         self._re_bibtex_error = re.compile(r"(.*)---line (\d+) of file (.*)")
@@ -34,6 +34,9 @@ class TeXRenderer:
         self._env = os.environ.copy()
         self._settings = None
         self._settings_u = None
+
+    def set_cache_path(self, cwd):
+        self.cwd = cwd
         print("TeXRenderer cwd is:" + self.cwd)
 
     def use_settings(self):
@@ -55,6 +58,8 @@ class TeXRenderer:
         # BSINPUTS, BIBINPUTS variable!! --> bst files
         if (style + ".bst" in os.listdir(os.path.dirname(bibfile))):
             self._env["BSTINPUTS"] = os.path.dirname(bibfile)
+
+        print("bbl path is: " + os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"))
 
         with open(os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"), "w") as caux:
             caux.write(aux_skeleton.format(style=style, bibl=bibfile.rstrip('.bib')))

@@ -11,6 +11,10 @@ def plugin_loaded():
     except OSError:
         pass
 
+    HoverCite.bibman.set_cache_path(sublime.cache_path())
+
+    print("citesuite loaded")
+
 
 class HoverCite(sublime_plugin.ViewEventListener):
     # these cannot be per-instance since focusing on file load would not work.

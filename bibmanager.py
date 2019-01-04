@@ -7,9 +7,13 @@ class BibManager:
     def __init__(self):
         self.style = "IEEEtran"
         self.bib_entries = dict()
-        self.tex_interface = tex_interface.TeXRenderer(cwd=os.path.join(sublime.cache_path(), "texcuite"))
+        self.cwd = None
+        self.tex_interface = tex_interface.TeXRenderer()
         self.bblparser = bblparser.BBLParser()
 
+    def set_cache_path(self, cwd):
+        self.cwd = cwd
+        self.tex_interface.set_cache_path(cwd)
 
     def set_style(self, style):
         self.style = style
