@@ -5,6 +5,13 @@ import os
 from . import bibmanager
 from . import bibphantoms
 
+def plugin_loaded():
+    try:
+        os.makedirs(os.path.join(sublime.cache_path(), "texcuite"))
+    except OSError:
+        pass
+
+
 class HoverCite(sublime_plugin.ViewEventListener):
     # these cannot be per-instance since focusing on file load would not work.
     bibman = bibmanager.BibManager()
@@ -18,12 +25,13 @@ class HoverCite(sublime_plugin.ViewEventListener):
         super().__init__(*args, **kwargs)
         self.errors = dict()
 
-        self._default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
-        self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
+        self._user_settings = None
+        self._default_settings = None
         HoverCite.bibman.set_style("alpha")
 
     def use_settings(self):
         self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
+        self._default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
 
 
     def on_hover(self, point, hover_zone):
@@ -87,5 +95,4 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
                 self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
                 HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
-
 

@@ -32,9 +32,13 @@ class TeXRenderer:
         self._re_bibtex_warning1 = re.compile(r"Warning--(.*?) in (.*)")
         self._re_bibtex_warning2 = re.compile(r"Warning--(.*?)\n--line (\d+)", re.MULTILINE)
         self._env = os.environ.copy()
+        self._settings = None
+        self._settings_u = None
+        print("TeXRenderer cwd is:" + self.cwd)
+
+    def use_settings(self):
         self._settings = sublime.load_settings("TeXCuite-default.sublime-settings")
         self._settings_u = sublime.load_settings("TeXCuite-user.sublime-settings")
-        print(sublime.cache_path())
 
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)
@@ -47,12 +51,10 @@ class TeXRenderer:
 
 
     def generate_bbl(self, style, bibfile):
+        self.use_settings()
         # BSINPUTS, BIBINPUTS variable!! --> bst files
-        self._env["BSTINPUTS"] = os.path.dirname(bibfile)
-        bstsettings = self._settings_u.get("bibtex", self._settings.get("bibtex"))
-        print("bstsettings:" + str(bstsettings))
-        if bstsettings and "bstpath" in bstsettings[sublime.platform()]:
-            self._env["BSTINPUTS"] += ";" + bstsettings[sublime.platform()]["bstpath"]
+        if (style + ".bst" in os.listdir(os.path.dirname(bibfile))):
+            self._env["BSTINPUTS"] = os.path.dirname(bibfile)
 
         with open(os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"), "w") as caux:
             caux.write(aux_skeleton.format(style=style, bibl=bibfile.rstrip('.bib')))

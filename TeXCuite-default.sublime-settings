@@ -1,17 +1,6 @@
 {
 	"bib_errors": true,
-	"bibtex": {
-		"linux": {
-		},
-		"windows": {
-
-		},
-		"osx": {
-			"bstpath": "/usr/local/texlive/2018/texmf-dist/bibtex/bst/"
-		}
-
-	},
-
+	
 	"references": {
 		"locale": "en",
 		"locales": {

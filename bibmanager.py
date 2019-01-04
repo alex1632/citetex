@@ -7,9 +7,9 @@ class BibManager:
     def __init__(self):
         self.style = "IEEEtran"
         self.bib_entries = dict()
-        self._settings_u = sublime.load_settings("TeXCuite-user.sublime-settings")
-        self.tex_interface = tex_interface.TeXRenderer(cwd=sublime.cache_path())
+        self.tex_interface = tex_interface.TeXRenderer(cwd=os.path.join(sublime.cache_path(), "texcuite"))
         self.bblparser = bblparser.BBLParser()
+
 
     def set_style(self, style):
         self.style = style
@@ -29,6 +29,8 @@ class BibManager:
             candidates = list(filter(lambda x: x.endswith('.bib'), os.listdir(env)))
             if candidates:
                 bibfiles = [os.path.join(env, x) for x in candidates]
+
+            print("bibfiles: " + str(candidates))
         return bibfiles
 
 
