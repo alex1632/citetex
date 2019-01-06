@@ -37,7 +37,9 @@ class TexcuiteFetchDoi(sublime_plugin.WindowCommand):
 
         bibfiles = find_bibfiles(buffer_name)
         if bibfiles:
-            self.window.open_file(bibfiles[0])
+            bibfile = self.window.open_file(bibfiles[0])
+            if not bibfile.is_loading():
+                bibfile.run_command("texcuite_insert_bibtex", {"entry": bibtexentry})
 
             global pending_callbacks
             pending_callbacks[bibfiles[0]] = {"entry": bibtexentry}
@@ -45,26 +47,23 @@ class TexcuiteFetchDoi(sublime_plugin.WindowCommand):
 
 class TexcuiteInsertBibtex(sublime_plugin.TextCommand):
     def run(self, edit, entry):
-        new_entry = "\n" + entry
-        self.view.insert(edit, self.view.size(), entry)
+        new_entry = "\n" + entry.replace('}, ', '},\n\t')
+        pos = self.view.size()
+        self.view.insert(edit, pos, new_entry)
+        self.view.show(pos)
 
 
 
 class DoiEventListener(sublime_plugin.ViewEventListener):
 
-    def on_activated(self):
-        global pending_callbacks
-        if not self.view.is_loading() and self.view.file_name() in pending_callbacks:
-            self._handle_doi(self.view.file_name())
     def on_load(self):
         global pending_callbacks
         if self.view.file_name() in pending_callbacks:
+            print("Handle DOI II")
             self._handle_doi(self.view.file_name())
 
     def _handle_doi(self, file_name):
         print("Processing callback for" + file_name)
-
-        print(self.view.symbols())
 
         self.view.run_command("texcuite_insert_bibtex", {"entry": pending_callbacks[file_name]["entry"]})
 
