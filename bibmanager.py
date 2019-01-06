@@ -2,6 +2,7 @@ import sublime
 import os
 from . import tex_interface
 from . import bblparser
+from .utils import find_bibfiles
 
 class BibManager:
     def __init__(self):
@@ -20,21 +21,15 @@ class BibManager:
 
     def detect_environment(self, project_data, buffer_name):
         bibfiles = None
-        if buffer_name: # file exists on disk
-            env = os.path.dirname(buffer_name)
-        else:
-            return None # we shouldn't end up here
 
         if project_data: # Sublime window has active project file
             if "texcite" in project_data:
                 bibfiles = project_data["texcite"]["bibfiles"] if "bibfiles" in project_data["texcite"] else None
 
         if not bibfiles:
-            candidates = list(filter(lambda x: x.endswith('.bib'), os.listdir(env)))
-            if candidates:
-                bibfiles = [os.path.join(env, x) for x in candidates]
+            bibfiles = find_bibfiles(buffer_name)
 
-            print("bibfiles: " + str(candidates))
+            print("bibfiles: " + str(bibfiles))
         return bibfiles
 
 
