@@ -21,6 +21,10 @@ class BibManager:
 
     def detect_environment(self, project_data, buffer_name):
         bibfiles = None
+        if buffer_name: # file exists on disk
+            env = os.path.dirname(buffer_name)
+        else:
+            return None # we shouldn't end up here
 
         if project_data: # Sublime window has active project file
             if "texcite" in project_data:

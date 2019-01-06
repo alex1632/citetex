@@ -1,22 +1,24 @@
 import sublime
 import sublime_plugin
 
-class TexcuiteSetBibstyleCommand(sublime_plugin.WindowCommand):
+class TexcuiteSetBibstyleCommand(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._selections = ['IEEEtran', 'alpha', 'geralpha']
-    def run(self):
-        self.window.show_quick_panel(self._selections, self._handle_stylechange)
+    def run(self, edit):
+        self.view.window().show_quick_panel(self._selections, self._handle_stylechange)
 
     def _handle_stylechange(self, selection):
-        print(self._selections[selection])
-        project_data = self.window.project_data()
-        if "settings" in project_data:
-            project_data["settings"]["bibstyle"] = self._selections[selection]
-        else:
+        project_data = self.view.window().project_data() or {}
+
+
+        if "settings" not in project_data:
             project_data["settings"] = {}
-            project_data["settings"]["bibstyle"] = self._selections[selection]
-        self.window.set_project_data(project_data)
+
+        project_data["settings"]["bibstyle"] = self._selections[selection]
+
+        self.view.window().set_project_data(project_data)
+        # print(self._selections[selection])
 
 class TexcuiteHandleConfigCommand(sublime_plugin.ApplicationCommand):
     def __init__(self, *args, **kwargs):
