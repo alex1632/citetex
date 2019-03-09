@@ -2,6 +2,7 @@ import sublime
 import os
 from . import tex_interface
 from . import bblparser
+from . import bibparser
 from .utils import find_bibfiles
 
 class BibManager:
@@ -11,6 +12,7 @@ class BibManager:
         self.cwd = None
         self.tex_interface = tex_interface.TeXRenderer()
         self.bblparser = bblparser.BBLParser()
+        self.bibparser = bibparser.BibParser()
 
     def set_cache_path(self, cwd):
         self.cwd = cwd
@@ -41,9 +43,13 @@ class BibManager:
         bblfile, errors = self.tex_interface.generate_bbl(self.style, bibfile)
 
         if os.path.exists(bblfile):
+            self.bib_entries[bibfile] = self.bibparser.parse_bibfile(bibfile)
             with open(bblfile, "r", encoding="utf-8") as bbl:
                 content = bbl.read()
-                self.bib_entries[bibfile] = self.bblparser.parse_bbl(content)
+                bbl_info = self.bblparser.parse_bbl(content)
+                for key in self.bib_entries[bibfile]:
+                    self.bib_entries[bibfile][key].update(bbl_info[key])
+                print(self.bib_entries[bibfile])
 
 
         return errors
@@ -65,11 +71,13 @@ class BibManager:
         for bib in self.bib_entries:
             if key in self.bib_entries[bib]:
                 image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
-                if "ref" in self.bib_entries[bib][key]:
-                    properties["ref"] = self.bib_entries[bib][key]["ref"]
+                # if "ref" in self.bib_entries[bib][key]:
+                #     properties["ref"] = self.bib_entries[bib][key]["ref"]
                 
-                properties["bibfile"] = bib
+                # properties["url"] = self.bib_entries[bib][key]["url"] if "url" in self.bib_entries[bib][key] else None
+                properties = self.bib_entries[bib][key]
                 properties["key"] = key
+                properties["bibfile"] = bib
                 break
 
         return image_path, properties

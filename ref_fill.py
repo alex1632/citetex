@@ -103,8 +103,6 @@ class TexcuiteGotoLabelCommand(sublime_plugin.WindowCommand):
                 global file_ref_loaded
                 file_ref_loaded = sel
         else:
-            # print(tex_view.symbols(), entry["label"])
-            # print(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0])
             tex_view.show_at_center(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0].a)
 
         

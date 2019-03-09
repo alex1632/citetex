@@ -1,6 +1,7 @@
 from threading import Lock
 import sublime
 import sublime_plugin
+import subprocess
 import os
 from . import bibmanager
 from . import bibphantoms
@@ -12,7 +13,6 @@ def plugin_loaded():
         pass
 
     HoverCite.bibman.set_cache_path(sublime.cache_path())
-
     print("citesuite loaded")
 
 
@@ -51,6 +51,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
                     info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
                 info_content += """<p><img src="file://{}"></p>\n""".format(image_path)
                 info_content += """<a href="gotobib">BibTeX entry</a>"""
+                if "url" in HoverCite.current_properties:
+                    info_content += """ | <a href="viewurl">View URL</a>"""
                 self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
 
     def handle_popup(self, command):
@@ -63,12 +65,16 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 marker = next(filter(lambda x: x[1] == HoverCite.current_properties['key'], bib_view.symbols()), None)[0]
                 bib_view.show_at_center(marker)
 
+        if command == "viewurl":
+            url = HoverCite.current_properties["url"]
+            subprocess.Popen("firefox --new-tab {}".format(url), shell=True)
+
     def on_load_async(self):
         with HoverCite.mutex:
             if HoverCite.LOAD_PENDING and "text.biblatex" in self.view.scope_name(self.view.sel()[0].a).split():
                 self.view.show_at_center(next(filter(lambda x: x[1] == HoverCite.current_properties['key'], self.view.symbols()), None)[0])
                 HoverCite.LOAD_PENDING = None
-            
+
 
     def on_activated_async(self):
         file_name = self.view.file_name()
@@ -81,10 +87,10 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 # adjust rendering style to project
                 project_data = self.view.window().project_data()
                 project_settings = project_data['settings'] if(project_data is not None and "settings" in project_data) else {}
-                
+
                 if "bibstyle" in project_settings:
                     HoverCite.bibman.set_style(project_settings['bibstyle'])
-                
+
                 self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
 
                 if self.view.file_name().endswith('.bib'):
@@ -99,4 +105,3 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
                 self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
                 HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
-
