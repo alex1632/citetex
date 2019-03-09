@@ -53,6 +53,10 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 info_content += """<a href="gotobib">BibTeX entry</a>"""
                 if "url" in HoverCite.current_properties:
                     info_content += """ | <a href="viewurl">View URL</a>"""
+
+                if "DOI" in HoverCite.current_properties:
+                    info_content += """ | <a href="viewdoi">View DOI</a>"""
+
                 self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
 
     def handle_popup(self, command):
@@ -65,9 +69,14 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 marker = next(filter(lambda x: x[1] == HoverCite.current_properties['key'], bib_view.symbols()), None)[0]
                 bib_view.show_at_center(marker)
 
-        if command == "viewurl":
+        elif command == "viewurl":
             url = HoverCite.current_properties["url"]
             subprocess.Popen("firefox --new-tab {}".format(url), shell=True)
+
+        elif command == "viewdoi":
+            url = "http://dx.doi.org/" + HoverCite.current_properties["DOI"]
+            subprocess.Popen("firefox --new-tab {}".format(url), shell=True)
+
 
     def on_load_async(self):
         with HoverCite.mutex:

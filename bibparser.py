@@ -25,7 +25,7 @@ class BibParser:
                 match = self._bibentry_type_re.match(entry)
                 if match:
                     groups = match.groups()
-                    if groups[0] == "url":
+                    if groups[0] == "url" or groups[0] == "DOI":
                         data[current_key][groups[0]] = groups[1]
 
                     continue
