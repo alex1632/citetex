@@ -60,6 +60,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
 
     def handle_popup(self, command):
+        self.use_settings()
+        webbrowser_cmd = self._user_settings.get("webbrowser", self._default_settings.get("webbrowser"))
         if command == "gotobib":
             bib_view = self.view.window().open_file(HoverCite.current_properties["bibfile"])
             if bib_view.is_loading():
@@ -71,11 +73,11 @@ class HoverCite(sublime_plugin.ViewEventListener):
 
         elif command == "viewurl":
             url = HoverCite.current_properties["url"]
-            subprocess.Popen("firefox --new-tab {}".format(url), shell=True)
+            subprocess.Popen("{} {}".format(webbrowser_cmd, url), shell=True)
 
         elif command == "viewdoi":
             url = "http://dx.doi.org/" + HoverCite.current_properties["DOI"]
-            subprocess.Popen("firefox --new-tab {}".format(url), shell=True)
+            subprocess.Popen("{} {}".format(webbrowser_cmd, url), shell=True)
 
 
     def on_load_async(self):
