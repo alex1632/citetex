@@ -125,3 +125,9 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
                 self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
                 HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
+
+        elif self.view.file_name().endswith('.tex'):
+            if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")) or True:
+                HoverCite.tex_phan.update_phantoms(self.view, HoverCite.bibman.bib_entries)
+            else:
+                HoverCite.tex_phan.clear_phantoms()
