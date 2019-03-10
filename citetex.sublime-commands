@@ -1,0 +1,10 @@
+[
+	{"caption": "CiteTex: Set bibliography style", "command": "citetex_set_bibstyle"},
+	{"caption": "CiteTex: Enable error display in bibfile", "command": "citetex_handle_config", 
+		"args": {"entry": "bib_errors", "param": true}},
+	{"caption": "CiteTex: Disable error display in bibfile", "command": "citetex_handle_config", 
+		"args": {"entry": "bib_errors", "param": false}},
+	{"caption": "CiteTex: Go to label", "command": "citetex_goto_label"},
+	{"caption": "CiteTex: Toggle TeX phantoms", "command": "citetex_toggle_tex_phantoms"},
+	{"caption": "CiteTex: DOI to Bibtex", "command": "citetex_doi_to_bibtex"}
+]

@@ -85,8 +85,8 @@ class JumpListener(sublime_plugin.EventListener):
 
 class CitetexApplyRefCommand(sublime_plugin.TextCommand):
     def run(self, edit, number):
-        default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
-        user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
+        default_settings = sublime.load_settings("CiteTeX-default.sublime-settings")
+        user_settings = sublime.load_settings("CiteTeX-user.sublime-settings")
         exp = self.view.word(self.view.sel()[0])
         self.view.replace(edit, exp, reference_server.query_entry(number,
                                                                   user_settings,

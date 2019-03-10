@@ -36,8 +36,6 @@ class BibParser:
                 if match:
                     data[current_key]['resources'] = match.groups()[1]
 
-        print(data)
-
         return data
 
 

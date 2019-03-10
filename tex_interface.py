@@ -40,8 +40,8 @@ class TeXRenderer:
         print("TeXRenderer cwd is:" + self.cwd)
 
     def use_settings(self):
-        self._settings = sublime.load_settings("TeXCuite-default.sublime-settings")
-        self._settings_u = sublime.load_settings("TeXCuite-user.sublime-settings")
+        self._settings = sublime.load_settings("CiteTeX-default.sublime-settings")
+        self._settings_u = sublime.load_settings("CiteTeX-user.sublime-settings")
 
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)

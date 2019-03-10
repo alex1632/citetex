@@ -9,12 +9,12 @@ from . import texcitephantoms as texphantoms
 
 def plugin_loaded():
     try:
-        os.makedirs(os.path.join(sublime.cache_path(), "texcuite"))
+        os.makedirs(os.path.join(sublime.cache_path(), "citetex"))
     except OSError:
         pass
 
     HoverCite.bibman.set_cache_path(sublime.cache_path())
-    print("citesuite loaded")
+    print("CiteTex loaded")
 
 
 class HoverCite(sublime_plugin.ViewEventListener):
@@ -36,8 +36,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
         HoverCite.bibman.set_style("alpha")
 
     def use_settings(self):
-        self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
-        self._default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
+        self._user_settings = sublime.load_settings("CiteTeX-user.sublime-settings")
+        self._default_settings = sublime.load_settings("CiteTeX-default.sublime-settings")
 
 
     def on_hover(self, point, hover_zone):
@@ -120,17 +120,25 @@ class HoverCite(sublime_plugin.ViewEventListener):
 
 
     def on_post_save_async(self):
+        self.use_settings()
         if self.view.file_name().endswith('.bib'):
-            self.use_settings()
             if self._user_settings.get("bib_errors", self._default_settings.get("bib_errors")):
                 self.errors = HoverCite.bibman.refresh_all_entries(self.view.window().project_data(), self.view.file_name())
                 HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
 
         elif self.view.file_name().endswith('.tex'):
-            self.refresh_tex_phantoms()
+            if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")):
+                self.refresh_tex_phantoms()
 
     def refresh_tex_phantoms(self):
-        if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")) or True:
+        if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")):
             HoverCite.tex_phan.update_phantoms(self.view, HoverCite.bibman.bib_entries)
         else:
             HoverCite.tex_phan.clear_phantoms()
+
+
+    def on_post_text_command(self, command_name, args):
+        # used if settings change
+        if command_name == "citetex_toggle_tex_phantoms":
+            self.use_settings()
+            self.refresh_tex_phantoms()

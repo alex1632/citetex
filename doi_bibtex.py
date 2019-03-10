@@ -21,7 +21,7 @@ class CitetexDoiToBibtexCommand(sublime_plugin.TextCommand):
             doi = link
 
         # run DOI get asynchronously
-        sublime.set_timeout_async(lambda: self.view.window().run_command("texcuite_fetch_doi", {"doi": doi, "buffer_name": self.view.file_name()}), 0)
+        sublime.set_timeout_async(lambda: self.view.window().run_command("citetex_fetch_doi", {"doi": doi, "buffer_name": self.view.file_name()}), 0)
 
 class CitetexFetchDoi(sublime_plugin.WindowCommand):
     def run(self, doi, buffer_name):
@@ -39,12 +39,12 @@ class CitetexFetchDoi(sublime_plugin.WindowCommand):
         if bibfiles:
             bibfile = self.window.open_file(bibfiles[0])
             if not bibfile.is_loading():
-                bibfile.run_command("texcuite_insert_bibtex", {"entry": bibtexentry})
+                bibfile.run_command("citetex_insert_bibtex", {"entry": bibtexentry})
 
             global pending_callbacks
             pending_callbacks[bibfiles[0]] = {"entry": bibtexentry}
         else:
-            self.window.active_view().run_command("texcuite_insert_bibtex", {"entry": bibtexentry})
+            self.window.active_view().run_command("citetex_insert_bibtex", {"entry": bibtexentry})
 
 
 class CitetexInsertBibtex(sublime_plugin.TextCommand):
@@ -67,7 +67,7 @@ class DoiEventListener(sublime_plugin.ViewEventListener):
     def _handle_doi(self, file_name):
         print("Processing callback for" + file_name)
 
-        self.view.run_command("texcuite_insert_bibtex", {"entry": pending_callbacks[file_name]["entry"]})
+        self.view.run_command("citetex_insert_bibtex", {"entry": pending_callbacks[file_name]["entry"]})
 
         del pending_callbacks[file_name]
 

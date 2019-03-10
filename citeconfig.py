@@ -23,16 +23,24 @@ class CitetexSetBibstyleCommand(sublime_plugin.TextCommand):
 class CitetexHandleConfigCommand(sublime_plugin.ApplicationCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
+        self._user_settings = sublime.load_settings("CiteTeX-user.sublime-settings")
 
     def load_settings(self):
-        self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
+        self._user_settings = sublime.load_settings("CiteTeX-user.sublime-settings")
 
     def save_settings(self):
-        sublime.save_settings("TeXCuite-user.sublime-settings")
+        sublime.save_settings("CiteTeX-user.sublime-settings")
 
     def run(self, entry, param):
-        print(entry, param)
+        # print(entry, param)
         self.load_settings()
         self._user_settings.set(entry, param)
         self.save_settings()
+
+class CitetexToggleTexPhantoms(sublime_plugin.TextCommand):
+    def run(self, edit):
+        s = sublime.load_settings("CiteTeX-user.sublime-settings")
+        phantoms_active = s.get("tex_phantoms", True)
+
+        s.set("tex_phantoms", phantoms_active is False) # toggle setting
+        sublime.save_settings("CiteTeX-user.sublime-settings")

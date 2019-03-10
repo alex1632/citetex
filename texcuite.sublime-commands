@@ -1,9 +1,0 @@
-[
-	{"caption": "CiteTex: Set bibliography style", "command": "texcuite_set_bibstyle"},
-	{"caption": "CiteTex: Enable error display in bibfile", "command": "texcuite_handle_config", 
-		"args": {"entry": "bib_errors", "param": true}},
-	{"caption": "CiteTex: Disable error display in bibfile", "command": "texcuite_handle_config", 
-		"args": {"entry": "bib_errors", "param": false}},
-	{"caption": "CiteTex: Go to label", "command": "texcuite_goto_label"},
-	{"caption": "CiteTex: DOI to Bibtex", "command": "texcuite_doi_to_bibtex"}
-]

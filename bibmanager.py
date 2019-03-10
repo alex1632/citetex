@@ -69,10 +69,6 @@ class BibManager:
         for bib in self.bib_entries:
             if key in self.bib_entries[bib]:
                 image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
-                # if "ref" in self.bib_entries[bib][key]:
-                #     properties["ref"] = self.bib_entries[bib][key]["ref"]
-                
-                # properties["url"] = self.bib_entries[bib][key]["url"] if "url" in self.bib_entries[bib][key] else None
                 properties = self.bib_entries[bib][key]
                 properties["key"] = key
                 properties["bibfile"] = bib
