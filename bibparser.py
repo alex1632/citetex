@@ -3,7 +3,7 @@ import re
 class BibParser:
     def __init__(self):
         self._type_key_re = re.compile(r"\s*@(\w*){(.*),")
-        self._bibentry_type_re = re.compile(r"\s*(\w+)={(.*)}.*")
+        self._bibentry_type_re = re.compile(r"\s*(\w+)=(?:{|\")(.*)(?:}|\").*")
         self._comment_file_re = re.compile(r"--resource{(.*)}{(.*)}")
 
     def parse_bibfile(self, bibfile):
@@ -25,14 +25,18 @@ class BibParser:
                 match = self._bibentry_type_re.match(entry)
                 if match:
                     groups = match.groups()
-                    if groups[0] == "url" or groups[0] == "DOI":
+                    if groups[0] == "url" or groups[0] == "DOI" or groups[0] == "year":
                         data[current_key][groups[0]] = groups[1]
+                    elif groups[0] == "title" or groups[0] == "booktitle":
+                        data[current_key]["title"] = groups[1].replace('{', '').replace('}', '')
 
                     continue
 
                 match = self._comment_file_re.match(entry)
                 if match:
                     data[current_key]['resources'] = match.groups()[1]
+
+        print(data)
 
         return data
 

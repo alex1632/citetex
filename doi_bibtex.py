@@ -43,6 +43,8 @@ class TexcuiteFetchDoi(sublime_plugin.WindowCommand):
 
             global pending_callbacks
             pending_callbacks[bibfiles[0]] = {"entry": bibtexentry}
+        else:
+            self.window.active_view().run_command("texcuite_insert_bibtex", {"entry": bibtexentry})
 
 
 class TexcuiteInsertBibtex(sublime_plugin.TextCommand):

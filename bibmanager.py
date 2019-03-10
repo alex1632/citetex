@@ -49,8 +49,6 @@ class BibManager:
                 bbl_info = self.bblparser.parse_bbl(content)
                 for key in self.bib_entries[bibfile]:
                     self.bib_entries[bibfile][key].update(bbl_info[key])
-                print(self.bib_entries[bibfile])
-
 
         return errors
 

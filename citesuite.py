@@ -5,6 +5,7 @@ import subprocess
 import os
 from . import bibmanager
 from . import bibphantoms
+from . import texcitephantoms as texphantoms
 
 def plugin_loaded():
     try:
@@ -20,6 +21,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
     # these cannot be per-instance since focusing on file load would not work.
     bibman = bibmanager.BibManager()
     bibphan = bibphantoms.BibPhantomManager()
+    tex_phan = texphantoms.TexPhantomManager()
     LOAD_PENDING = None
     mutex = Lock()
     current_properties = dict()
@@ -44,7 +46,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
-            print(image_path)
             info_content = ""
             if image_path:
                 if "ref" in HoverCite.current_properties:
@@ -92,9 +93,9 @@ class HoverCite(sublime_plugin.ViewEventListener):
         path_of_file = os.path.dirname(file_name) if file_name else None
         scope = self.view.scope_name(0)
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
+            self.use_settings() # since we use settings, reload them
             if path_of_file != HoverCite.current_path:
                 HoverCite.current_path = path_of_file
-                self.use_settings() # since we use settings, reload them
                 # adjust rendering style to project
                 project_data = self.view.window().project_data()
                 project_settings = project_data['settings'] if(project_data is not None and "settings" in project_data) else {}
@@ -109,6 +110,14 @@ class HoverCite(sublime_plugin.ViewEventListener):
                         HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
                     else:
                         HoverCite.bibphan.clear_phantoms()
+
+            if self.view.file_name().endswith('.tex'):
+                if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")) or True:
+                    HoverCite.tex_phan.update_phantoms(self.view, HoverCite.bibman.bib_entries)
+                else:
+                    HoverCite.tex_phan.clear_phantoms()
+
+
 
     def on_post_save_async(self):
         if self.view.file_name().endswith('.bib'):
