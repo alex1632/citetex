@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-class TexcuiteSetBibstyleCommand(sublime_plugin.TextCommand):
+class CitetexSetBibstyleCommand(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._selections = ['IEEEtran', 'alpha', 'geralpha']
@@ -20,7 +20,7 @@ class TexcuiteSetBibstyleCommand(sublime_plugin.TextCommand):
         self.view.window().set_project_data(project_data)
         # print(self._selections[selection])
 
-class TexcuiteHandleConfigCommand(sublime_plugin.ApplicationCommand):
+class CitetexHandleConfigCommand(sublime_plugin.ApplicationCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")

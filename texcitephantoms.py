@@ -23,7 +23,7 @@ class TexPhantomManager:
                     title = bibentries[bfile][key]["title"][:40]
                     if len(title) == 40:
                         title += "..."
-                    phantom_content = """<div style="color: #666">({}, {})</div>""".format(title, bibentries[bfile][key]["year"])
+                    phantom_content = """<div style="color: #666">({1}: {0})</div>""".format(title, bibentries[bfile][key]["ref"])
                     # bring phantoms to the back
                     region.a = region.b
                     region.b += 1

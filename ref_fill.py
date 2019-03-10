@@ -1,3 +1,5 @@
+# Menu-based reference completion
+
 import sublime
 import sublime_plugin
 import html
@@ -81,7 +83,7 @@ class JumpListener(sublime_plugin.EventListener):
 
 
 
-class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
+class CitetexApplyRefCommand(sublime_plugin.TextCommand):
     def run(self, edit, number):
         default_settings = sublime.load_settings("TeXCuite-default.sublime-settings")
         user_settings = sublime.load_settings("TeXCuite-user.sublime-settings")
@@ -91,7 +93,7 @@ class TexcuiteApplyRefCommand(sublime_plugin.TextCommand):
                                                                   default_settings,
                                                                   self.view.window().project_data()))
 
-class TexcuiteGotoLabelCommand(sublime_plugin.WindowCommand):
+class CitetexGotoLabelCommand(sublime_plugin.WindowCommand):
     def run(self):
         self.window.show_quick_panel(reference_server.deliver_entries(), self.on_apply_selection)
 

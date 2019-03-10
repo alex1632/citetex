@@ -8,7 +8,7 @@ from .utils import find_bibfiles
 
 pending_callbacks = dict()
 
-class TexcuiteDoiToBibtexCommand(sublime_plugin.TextCommand):
+class CitetexDoiToBibtexCommand(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     def run(self, edit):
@@ -23,7 +23,7 @@ class TexcuiteDoiToBibtexCommand(sublime_plugin.TextCommand):
         # run DOI get asynchronously
         sublime.set_timeout_async(lambda: self.view.window().run_command("texcuite_fetch_doi", {"doi": doi, "buffer_name": self.view.file_name()}), 0)
 
-class TexcuiteFetchDoi(sublime_plugin.WindowCommand):
+class CitetexFetchDoi(sublime_plugin.WindowCommand):
     def run(self, doi, buffer_name):
         self._get_doi(doi, buffer_name)
         print("DOI is:" + doi)
@@ -47,7 +47,7 @@ class TexcuiteFetchDoi(sublime_plugin.WindowCommand):
             self.window.active_view().run_command("texcuite_insert_bibtex", {"entry": bibtexentry})
 
 
-class TexcuiteInsertBibtex(sublime_plugin.TextCommand):
+class CitetexInsertBibtex(sublime_plugin.TextCommand):
     def run(self, edit, entry):
         new_entry = "\n" + entry.replace('}, ', '},\n\t')
         pos = self.view.size()

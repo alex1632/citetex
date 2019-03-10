@@ -47,18 +47,20 @@ class HoverCite(sublime_plugin.ViewEventListener):
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
             info_content = ""
+            if "ref" in HoverCite.current_properties:
+                info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
             if image_path:
-                if "ref" in HoverCite.current_properties:
-                    info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
                 info_content += """<p><img src="file://{}"></p>\n""".format(image_path)
-                info_content += """<a href="gotobib">BibTeX entry</a>"""
-                if "url" in HoverCite.current_properties:
-                    info_content += """ | <a href="viewurl">View URL</a>"""
 
-                if "DOI" in HoverCite.current_properties:
-                    info_content += """ | <a href="viewdoi">View DOI</a>"""
+            info_content += """<a href="gotobib">BibTeX entry</a>"""
 
-                self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
+            if "url" in HoverCite.current_properties:
+                info_content += """ | <a href="viewurl">View URL</a>"""
+
+            if "DOI" in HoverCite.current_properties:
+                info_content += """ | <a href="viewdoi">View DOI</a>"""
+
+            self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
 
     def handle_popup(self, command):
         self.use_settings()
@@ -82,6 +84,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
 
 
     def on_load_async(self):
+        # scoll to the first occurrence of the pending key to be displayed in the bibfile
         with HoverCite.mutex:
             if HoverCite.LOAD_PENDING and "text.biblatex" in self.view.scope_name(self.view.sel()[0].a).split():
                 self.view.show_at_center(next(filter(lambda x: x[1] == HoverCite.current_properties['key'], self.view.symbols()), None)[0])
@@ -94,7 +97,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
         scope = self.view.scope_name(0)
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
             self.use_settings() # since we use settings, reload them
-            if path_of_file != HoverCite.current_path:
+            if path_of_file != HoverCite.current_path: # if working directory has changed, reload bibfile and error phantoms
                 HoverCite.current_path = path_of_file
                 # adjust rendering style to project
                 project_data = self.view.window().project_data()
@@ -111,11 +114,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
                     else:
                         HoverCite.bibphan.clear_phantoms()
 
-            if self.view.file_name().endswith('.tex'):
-                if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")) or True:
-                    HoverCite.tex_phan.update_phantoms(self.view, HoverCite.bibman.bib_entries)
-                else:
-                    HoverCite.tex_phan.clear_phantoms()
+            if self.view.file_name().endswith('.tex'): # always refresh title phantoms in tex files
+                self.refresh_tex_phantoms()
 
 
 
@@ -127,7 +127,10 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
 
         elif self.view.file_name().endswith('.tex'):
-            if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")) or True:
-                HoverCite.tex_phan.update_phantoms(self.view, HoverCite.bibman.bib_entries)
-            else:
-                HoverCite.tex_phan.clear_phantoms()
+            self.refresh_tex_phantoms()
+
+    def refresh_tex_phantoms(self):
+        if self._user_settings.get("tex_phantoms", self._default_settings.get("tex_phantoms")) or True:
+            HoverCite.tex_phan.update_phantoms(self.view, HoverCite.bibman.bib_entries)
+        else:
+            HoverCite.tex_phan.clear_phantoms()
