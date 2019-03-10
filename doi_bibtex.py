@@ -55,9 +55,8 @@ class CitetexInsertBibtex(sublime_plugin.TextCommand):
         self.view.show(pos)
 
 
-
+# if bibfile is not open in sublime text
 class DoiEventListener(sublime_plugin.ViewEventListener):
-
     def on_load(self):
         global pending_callbacks
         if self.view.file_name() in pending_callbacks:
@@ -71,4 +70,3 @@ class DoiEventListener(sublime_plugin.ViewEventListener):
 
         del pending_callbacks[file_name]
 
-    # curl -LH "Accept: text/x-bibliography; style=bibtex" https://doi.org/10.1126/science.169.3946.635

@@ -34,17 +34,17 @@ class BibPhantomManager:
             elif "line" in err:
                 region = view.expand_by_class(view.line(view.text_point(err['line'], 0)), sublime.CLASS_LINE_START)
 
-            if err['level'] == "WARN":
-                error_content = '<body>' + self.stylesheet + \
-                            '<div class="warning">' +  html.escape(err['type'], quote=False) + ' ' + \
-                            '<a href=hide>(Close all)</a></div>' + \
-                            '</body>'
-            elif err['level'] == "ERROR":
-                error_content = '<body>' + self.stylesheet + \
-                            '<div class="error">' + html.escape(err['type'], quote=False) + " " + \
-                            '<a href=hide>(Close all)</a></div>' + \
-                            '</body>'
             if region:
+                if err['level'] == "WARN":
+                    error_content = '<body>' + self.stylesheet + \
+                                '<div class="warning">' +  html.escape(err['type'], quote=False) + ' ' + \
+                                '<a href=hide>(Close all)</a></div>' + \
+                                '</body>'
+                elif err['level'] == "ERROR":
+                    error_content = '<body>' + self.stylesheet + \
+                                '<div class="error">' + html.escape(err['type'], quote=False) + " " + \
+                                '<a href=hide>(Close all)</a></div>' + \
+                                '</body>'
                 self._phantoms.append(sublime.Phantom(region, error_content, sublime.LAYOUT_BELOW, self._handle_phantom_link))
 
         self._phantomset.update(self._phantoms)

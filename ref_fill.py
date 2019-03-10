@@ -17,7 +17,12 @@ class RefFiller(sublime_plugin.ViewEventListener):
         self.region = None
         self.entry = None
 
+
     def on_query_context(self, key, operator, operand, match_all):
+        '''
+        Reference autocompletion trigger (ref)
+        If no references are declared, ordinary word completion is performed
+        '''
         if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
             prefix = self.view.substr(self.view.word(self.view.sel()[0].b))
             if prefix == "ref":
@@ -28,7 +33,6 @@ class RefFiller(sublime_plugin.ViewEventListener):
         return None
 
     def on_hover(self, point, hover_zone):
-        # scopes = self.view.scope_name(self.view.sel()[0].begin()).split()
         scopes = self.view.scope_name(point).split()
         if 'text.tex.latex' in scopes and 'constant.other.reference.latex' in scopes:
             ref_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
@@ -48,8 +52,7 @@ class RefFiller(sublime_plugin.ViewEventListener):
 
 
     def on_apply_selection(self, number):
-        print(number)
-        if number != -1:
+        if number != -1: # if selection is not aborted
             self.view.run_command("citetex_apply_ref", {"number": number})              
 
     def on_activated(self):
@@ -57,8 +60,6 @@ class RefFiller(sublime_plugin.ViewEventListener):
             current_dir = os.path.dirname(self.view.file_name())
             if reference_server.rootdir != current_dir:
                 reference_server.update_references(current_dir)
-
-
 
     def on_post_save(self):
         if self.view.file_name().endswith('.tex'):
@@ -71,13 +72,16 @@ class JumpListener(sublime_plugin.EventListener):
         self.view = None
 
     def on_load_async(self, view):
+        '''
+        If referenced file, which should be displayed after request through popup is not loaded,
+        centering view on reference would fail if show_at center is called too early --> Use an EventListener
+        triggered on file load for this
+        '''
         self.view = view
         with file_ref_mutex:
             global file_ref_loaded
-            # if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
             if file_ref_loaded:
                 entry = reference_server.entries[file_ref_loaded]
-                # print(self.view.symbols(), entry["label"], "async")
                 region = next(filter(lambda x: x[1] == entry['label'], self.view.symbols()), (None, ))[0]
                 self.view.show_at_center(region.a)
                 file_ref_loaded = None
