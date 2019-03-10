@@ -3,6 +3,10 @@
 
 This plugin is not aimed at replacing LaTeXTools, its goal is rather to add some features regarding citation and reference completions.
 
+## How To
+
+### Reference completion
+Sophisticated reference completion is triggered by typing `ref<TAB>` in a `.tex` file. All defined symbols in other `.tex` files in the same folder will be listed. 
 
 ## Features
 
@@ -42,16 +46,7 @@ Testers on Mac and Windows are welcome! (I will not put too much effort in getti
 This plugin relies on LaTeX and BibTeX for rendering and handling tex files. Specifically, `latex` and `dvipng` should be availiable in your `PATH`. Other than that, no special python packages or executables are required.
 
 ### Temporary files
-CiteTeX uses the sublime text cache folder.
+CiteTeX uses a subfolder of the sublime text cache folder.
 
-### Using the Package
-For now, CiteTeX is not in Package Control. I aim to change this, though. For now it is best to clone this repository, and put a symlink into your `.config/sublime-text-3/Packages/` folder (bad luck for Windows users, you have to copy or clone it there):
-
-```(in .config...Packages): ln -s <path to your cloned repo of CiteTeX> CiteTeX ```
-
-Sublime Text will automatically recognize the new Folder as CiteTeX package.
-
-## How To
-
-### Reference completion
-Sophisticated reference completion is triggered by typing `ref<TAB>` in a `.tex` file. All defined symbols in other `.tex` files in the same folder will be listed. 
+# Questions ?
+Send me an e-mail: afk (at) daichronos (dot) net
