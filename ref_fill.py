@@ -48,8 +48,9 @@ class RefFiller(sublime_plugin.ViewEventListener):
 
 
     def on_apply_selection(self, number):
+        print(number)
         if number != -1:
-            self.view.run_command("texcuite_apply_ref", {"number": number})              
+            self.view.run_command("citetex_apply_ref", {"number": number})              
 
     def on_activated(self):
         if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
