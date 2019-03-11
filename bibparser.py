@@ -2,9 +2,9 @@ import re
 
 class BibParser:
     def __init__(self):
-        self._type_key_re = re.compile(r"\s*@(\w*){(.*),")
+        self._type_key_re = re.compile(r"\s*@(.*?){(.*),")
         self._bibentry_type_re = re.compile(r"\s*(\w+)=(?:{|\")(.*)(?:}|\").*")
-        self._comment_file_re = re.compile(r"--resource{(.*)}{(.*)}")
+        self._comment_file_re = re.compile(r"--resource{(.*)}{(PDF)} (.*)")
 
     def parse_bibfile(self, bibfile):
         # os.path.dirname(bibfile)
@@ -25,16 +25,19 @@ class BibParser:
                 match = self._bibentry_type_re.match(entry)
                 if match:
                     groups = match.groups()
-                    if groups[0] == "url" or groups[0] == "DOI" or groups[0] == "year":
-                        data[current_key][groups[0]] = groups[1]
-                    elif groups[0] == "title" or groups[0] == "booktitle":
+                    group_type = groups[0].lower()
+                    if group_type == "url" or group_type == "doi" or group_type == "year":
+                        data[current_key][group_type] = groups[1]
+                    elif (group_type == "title" or group_type == "booktitle") and 'title' not in data[current_key]:
                         data[current_key]["title"] = groups[1].replace('{', '').replace('}', '')
 
                     continue
 
                 match = self._comment_file_re.match(entry)
                 if match:
-                    data[current_key]['resources'] = match.groups()[1]
+                    groups = match.groups()
+                    data[groups[0]]['resource'] = groups[2]
+                    data[groups[0]]['resource_type'] = groups[1]
 
         return data
 

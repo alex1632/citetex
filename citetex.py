@@ -57,8 +57,11 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if "url" in HoverCite.current_properties:
                 info_content += """ | <a href="viewurl">View URL</a>"""
 
-            if "DOI" in HoverCite.current_properties:
+            if "doi" in HoverCite.current_properties:
                 info_content += """ | <a href="viewdoi">View DOI</a>"""
+
+            if "resource" in HoverCite.current_properties:
+                info_content += """ | <a href="viewres">View Resource ({})</a>""".format(HoverCite.current_properties['resource_type'])
 
             self.view.show_popup(info_content, sublime.HIDE_ON_MOUSE_MOVE_AWAY, point, max_width=800, on_navigate=self.handle_popup)
 
@@ -79,8 +82,17 @@ class HoverCite(sublime_plugin.ViewEventListener):
             subprocess.Popen("{} {}".format(webbrowser_cmd, url), shell=True)
 
         elif command == "viewdoi":
-            url = "http://dx.doi.org/" + HoverCite.current_properties["DOI"]
+            url = "http://dx.doi.org/" + HoverCite.current_properties["doi"]
             subprocess.Popen("{} {}".format(webbrowser_cmd, url), shell=True)
+
+        elif command == "viewres":
+            settings_property = "open_resource_{}".format(HoverCite.current_properties['resource_type'].lower())
+            resource_dir = self.view.window().project_data() or {}
+            if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
+                open_command = self._user_settings.get(settings_property, self._default_settings.get(settings_property)) + " {file}"
+                open_command = open_command.format(file=os.path.join(resource_dir['settings']['resource_root'], HoverCite.current_properties['resource']))
+                print(open_command)
+                subprocess.Popen(open_command, shell=True)
 
 
     def on_load_async(self):

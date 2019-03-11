@@ -49,7 +49,8 @@ class CitetexFetchDoi(sublime_plugin.WindowCommand):
 
 class CitetexInsertBibtex(sublime_plugin.TextCommand):
     def run(self, edit, entry):
-        new_entry = "\n" + entry.replace('}, ', '},\n\t')
+        # last replace is for first line
+        new_entry = "\n" + entry.replace('}, ', '},\n\t').replace(',', ',\n\t', 1)
         pos = self.view.size()
         self.view.insert(edit, pos, new_entry)
         self.view.show(pos)

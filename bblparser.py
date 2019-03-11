@@ -16,7 +16,7 @@ class BBLParser:
                 entries[current_entry] = dict()
                 entries[current_entry]['block'] = ""
                 if entry_start.groups()[0] is not None:
-                    entries[current_entry]['ref'] = entry_start.groups()[0].replace('{\\etalchar{+}}', '+')
+                    entries[current_entry]['ref'] = entry_start.groups()[0].replace('{\\etalchar{+}}', '+').replace('{', '').replace('}', '')
 
             elif line in suppressors:
                 continue
