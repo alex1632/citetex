@@ -6,5 +6,6 @@
 		"args": {"entry": "bib_errors", "param": false}},
 	{"caption": "CiteTex: Go to label", "command": "citetex_goto_label"},
 	{"caption": "CiteTex: Toggle TeX phantoms", "command": "citetex_toggle_tex_phantoms"},
-	{"caption": "CiteTex: DOI to Bibtex", "command": "citetex_doi_to_bibtex"}
+	{"caption": "CiteTex: DOI to Bibtex", "command": "citetex_doi_to_bibtex"},
+	{"caption": "CiteTex: Add resource to bibentry", "command": "citetex_add_resource"}
 ]
