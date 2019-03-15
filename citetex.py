@@ -129,8 +129,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if self.view.file_name().endswith('.tex'): # always refresh title phantoms in tex files
                 self.refresh_tex_phantoms()
 
-
-
     def on_post_save_async(self):
         self.use_settings()
         if self.view.file_name().endswith('.bib'):

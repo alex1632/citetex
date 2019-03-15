@@ -111,5 +111,4 @@ class CitetexGotoLabelCommand(sublime_plugin.WindowCommand):
                 file_ref_loaded = sel
         else:
             tex_view.show_at_center(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0].a)
-
         
