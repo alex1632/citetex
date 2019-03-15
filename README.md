@@ -51,6 +51,7 @@ The reason why I built it this way is that you may have a Git project for your T
 ### TODO
  - Raise warning in case of multiply defined labels or cite keys
  - Add support for other types of material (e.g. images)
+ - Mac OS, Windows support
 
 ### Sophisticated reference insertion
 
@@ -58,7 +59,7 @@ While LaTeXTools provides a fairly helpful completion menu when inserting refere
 
 
 ## Installation
-So far, this plugin has only been tested on the following Linux distributions:
+So far, this plugin has only been tested on the following operating systems:
 
  - Arch Linux
 
@@ -71,7 +72,7 @@ This plugin relies on LaTeX and BibTeX for rendering and handling tex files. Spe
 CiteTeX uses a subfolder of the sublime text cache folder.
 
 ## Known issues
-It may take while to index all entries and provide renderings for the popups when starting sublime text. 
+It may take while to index all entries and provide renderings for the popups when Sublime Text is started. 
 
 # Questions?
 Send me an e-mail: afk (at) daichronos (dot) net
