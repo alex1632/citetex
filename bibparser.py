@@ -3,7 +3,7 @@ import re
 class BibParser:
     def __init__(self):
         self._type_key_re = re.compile(r"\s*@(.*?){(.*),")
-        self._bibentry_type_re = re.compile(r"\s*(\w+)=(?:{|\")(.*)(?:}|\").*")
+        self._bibentry_type_re = re.compile(r"\s*(\w+)\s*=\s*(?:{|\")(.*)(?:}|\").*")
         self._comment_file_re = re.compile(r"@Comment\s*sublime-resource{(.*)}{(PDF)} (.*)")
 
     def parse_bibfile(self, bibfile):
@@ -38,7 +38,6 @@ class BibParser:
                     groups = match.groups()
                     data[groups[0]]['resource'] = groups[2]
                     data[groups[0]]['resource_type'] = groups[1]
-
         return data
 
 

@@ -29,7 +29,7 @@ class CitetexAddResource(sublime_plugin.TextCommand):
 
     def _insert_entry(self, index):
         if index != -1:
-            new_entry = "\n--resource{{{res}}}{{{typ}}} {name}".format(res=self.current_entry, typ=self._res_file_list[index][-3:].upper(), name = self._res_file_list[index])
+            new_entry = "\n@Comment sublime-resource{{{res}}}{{{typ}}} {name}".format(res=self.current_entry, typ=self._res_file_list[index][-3:].upper(), name = self._res_file_list[index])
             self.view.run_command("citetex_insert_resource_text", {"entry": new_entry})
             
 

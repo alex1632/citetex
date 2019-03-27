@@ -19,7 +19,11 @@ class TexPhantomManager:
         for key, region in zip(keys, regions):
             for bfile in bibentries:
                 if key in bibentries[bfile]:
-                    title = bibentries[bfile][key]["title"][:40]
+                    try:
+                        title = bibentries[bfile][key]["title"][:40]
+                    except KeyError:
+                        print("Key error on entry " + key)
+                        print(bibentries[bfile][key])
                     if len(title) == 40:
                         title += "..."
                     phantom_content = """<div style="color: #666">({1}: {0})</div>""".format(title, bibentries[bfile][key]["ref"])
