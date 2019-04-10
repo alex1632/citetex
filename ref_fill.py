@@ -23,7 +23,8 @@ class RefFiller(sublime_plugin.ViewEventListener):
         Reference autocompletion trigger (ref)
         If no references are declared, ordinary word completion is performed
         '''
-        if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
+        if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex") \
+            and operand == True and key == "bh_wrapping":
             prefix = self.view.substr(self.view.word(self.view.sel()[0].b))
             if prefix == "ref":
                 self.view.window().show_quick_panel(reference_server.deliver_entries(), self.on_apply_selection)

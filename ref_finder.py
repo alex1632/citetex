@@ -59,7 +59,6 @@ class ReferenceFinder:
 
 
     def deliver_entries(self):
-        print(self.entries)
         return [["{}".format(x["text"]), "{} {} - {}".format((x["params"] + x["type"]).title(), x["label"], os.path.basename(x["filename"]))] for x in self.entries]
 
     def query_entry(self, number, user_settings, default_settings, local_settings):

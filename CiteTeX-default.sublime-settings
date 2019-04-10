@@ -13,7 +13,8 @@
 				"section": "Kap.",
 				"chapter": "Kap.",
 				"equation": "Gl.",
-				"listing": "Lst."
+				"listing": "Lst.",
+				"algorithm": "Alg."
 			},
 			"en": {
 				"figure": "Fig.",
@@ -21,7 +22,8 @@
 				"section": "Sec.",
 				"chapter": "Ch.",
 				"equation": "Eq.",
-				"listing": "Lst."
+				"listing": "Lst.",
+				"algorithm": "Alg."
 			}
 
 		}
