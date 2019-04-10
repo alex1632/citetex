@@ -6,8 +6,8 @@ class ReferenceFinder:
         self.entries = list()
         self.rootdir = None
         self._titles_re = re.compile(r"\s*\\((?:sub){,2})(part|section|chapter|(?:foot)?caption)(?:\[.*\])?{(.*)}")
-        self._scope_re = re.compile(r"\s*\\(begin|end){(figure|table|equation)}")
-        self._label_re = re.compile(r"\s*\\label{(.*)}")
+        self._scope_re = re.compile(r"\s*\\(begin|end){(.*?)}.*")
+        self._label_re = re.compile(r".*\\label{(.*)}")
         self._listing_re = re.compile(r"(?:.*?(caption|label)=(.*?)(?:,|\]))")
 
     def update_references(self, rootdir):
@@ -26,7 +26,7 @@ class ReferenceFinder:
         with open(filename, "r", encoding="utf-8") as texfile:
             content = texfile.read().split('\n')
 
-        typ, params, text = None, None, None
+        typ, params, text = "", "", ""
         for line in content:
             label = self._label_re.match(line)
             scope = self._scope_re.match(line)
@@ -38,7 +38,7 @@ class ReferenceFinder:
                 if context == "begin":
                     typ = scope.groups()[1]
                 else:
-                    typ = None
+                    typ = ""
 
             elif title:
                 text = title.groups()[2]
@@ -46,18 +46,20 @@ class ReferenceFinder:
                 typ = title.groups()[1] if not title.groups()[1] == "caption" else typ
                 params = title.groups()[0]
 
-            elif label:
-                self.entries.append({"filename": filename, "type": typ if not None else "", "label": label.groups()[0], "text": text, "params": params})
-                typ, params, text = None, None, None
+            if label:
+                l = label.groups()
+                self.entries.append({"filename": filename, "type": typ, "label": l[0], "text": text if typ != "equation" else "Equation: {}".format(l[0]), "params": params})
+                typ, params, text = "", "", ""
 
             if listing:
                 text = next(filter(lambda x: x[0] == "caption", listing), (None, None))[1]
                 label = next(filter(lambda x: x[0] == "label", listing), (None, None))[1]
                 self.entries.append({"filename": filename, "type": "listing", "label": label, "text": text, "params": ''})
-                typ, params, text = None, None, None
+                typ, params, text = "", "", ""
 
 
     def deliver_entries(self):
+        print(self.entries)
         return [["{}".format(x["text"]), "{} {} - {}".format((x["params"] + x["type"]).title(), x["label"], os.path.basename(x["filename"]))] for x in self.entries]
 
     def query_entry(self, number, user_settings, default_settings, local_settings):
