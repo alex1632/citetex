@@ -19,7 +19,7 @@ class ReferenceFinder:
                 self.find_labels(os.path.join(self.rootdir, file))
 
     def update_file(self, filename):
-        self.entries = list(filter(lambda x: x != filename, self.entries))
+        self.entries = list(filter(lambda x: x["filename"] != filename, self.entries))
         self.find_labels(filename)
 
     def find_labels(self, filename):
@@ -74,7 +74,7 @@ class ReferenceFinder:
             locale_dict = config_user["locales"][locale] if (config_user is not None and "locales" in config_user) else config_default["locales"][locale]
 
             abbrv = locale_dict[entry["type"]]
-            return "{}~\\ref{{{}}} ".format(abbrv, entry["label"])
+            return "{}~\\ref{{{}}}".format(abbrv, entry["label"])
         except KeyError:
             print("Could not find definition for {} in locale {}".format(entry["type"], locale))
 
