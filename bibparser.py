@@ -4,7 +4,7 @@ class BibParser:
     def __init__(self):
         self._type_key_re = re.compile(r"\s*@(.*?){(.*),")
         self._bibentry_type_re = re.compile(r"\s*(\w+)\s*=\s*(?:{|\")(.*)(?:}|\").*")
-        self._comment_file_re = re.compile(r"@Comment\s*sublime-resource{(.*)}{(PDF)} (.*)")
+        self._comment_file_re = re.compile(r"%?@Comment\s*sublime-resource{(.*)}{(PDF)} (.*)")
 
     def parse_bibfile(self, bibfile):
         # os.path.dirname(bibfile)
