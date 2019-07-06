@@ -3,8 +3,8 @@ import re
 class BibParser:
     def __init__(self):
         self._type_key_re = re.compile(r"\s*@(.*?){(.*),")
-        self._bibentry_type_re = re.compile(r"\s*(\w+)\s*=\s*(?:{|\")(.*)(?:}|\").*")
-        self._comment_file_re = re.compile(r"@Comment\s*sublime-resource{(.*)}{(PDF)} (.*)")
+        self._bibentry_type_re = re.compile(r"\s*(\w+)\s*=\s*(?:{|\")((?:.*?(?:{.*?})?)+)(?:}|\"|$).*")
+        self._comment_file_re = re.compile(r"%@Comment\s*sublime-resource{(.*)}{(PDF)} (.*)")
 
     def parse_bibfile(self, bibfile):
         # os.path.dirname(bibfile)
@@ -30,6 +30,8 @@ class BibParser:
                         data[current_key][group_type] = groups[1]
                     elif (group_type == "title" or group_type == "booktitle") and 'title' not in data[current_key]:
                         data[current_key]["title"] = groups[1].replace('{', '').replace('}', '')
+                    elif group_type == "author":
+                        data[current_key]['author'] = groups[1].split(',')[0] # store only first author's last name
 
                     continue
 
