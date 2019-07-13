@@ -35,8 +35,9 @@ class ReferenceFinder:
 
             if scope:
                 context = scope.groups()[0]
-                if context == "begin":
-                    typ = scope.groups()[1]
+                proposed_type = scope.groups()[1]
+                if context == "begin" and proposed_type != 'minipage':
+                    typ = proposed_type
                 else:
                     typ = ""
 
@@ -57,9 +58,11 @@ class ReferenceFinder:
                 self.entries.append({"filename": filename, "type": "listing", "label": label, "text": text, "params": ''})
                 typ, params, text = "", "", ""
 
+        # print(self.entries)
+
 
     def deliver_entries(self):
-        return [["{}".format(x["text"]), "{} {} - {}".format((x["params"] + x["type"]).title(), x["label"], os.path.basename(x["filename"]))] for x in self.entries]
+        return [["{1}:  {0}".format(x["text"], x["type"]).title(), "{} {} - {}".format(x["params"] , x["label"], os.path.basename(x["filename"]))] for x in self.entries]
 
     def query_entry(self, number, user_settings, default_settings, local_settings):
         entry = self.entries[number]
@@ -74,9 +77,11 @@ class ReferenceFinder:
             locale_dict = config_user["locales"][locale] if (config_user is not None and "locales" in config_user) else config_default["locales"][locale]
 
             abbrv = locale_dict[entry["type"]]
+            print(entry['label'])
             return "{}~\\ref{{{}}}".format(abbrv, entry["label"])
         except KeyError:
             print("Could not find definition for {} in locale {}".format(entry["type"], locale))
+            return "\\ref{{{}}}".format(entry["label"])
 
     def query_popup(self, key):
         return next(filter(lambda x: x["label"] == key, self.entries), None)

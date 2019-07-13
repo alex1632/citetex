@@ -24,7 +24,6 @@ class CitetexViewResourcePdf(sublime_plugin.TextCommand):
         self.view.window().show_quick_panel(menu_select, self.handle_cb)
 
     def handle_cb(self, idx):
-        print(idx)
         settings_property = "open_resource_{}".format(self.entries[idx]['resource_type'].lower())
         resource_dir = self.view.window().project_data() or {}
         if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
