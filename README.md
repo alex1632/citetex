@@ -4,6 +4,7 @@
 This plugin is not aimed at replacing LaTeXTools, its goal is rather to add some features regarding citation and reference completions.
 
 ## Disclaimer
+Despite being stable for quite a time now, I cannot guarantee that errors may affect or even destroy you bib files.
 I am not responsible for any damage caused by this plugin, directly or indirectly. That includes in particular corruption or loss of you BibTeX files. Make sure you have a backup!
 
 ## How To Use
@@ -41,6 +42,7 @@ The reason why I built it this way is that you may have a Git project for your T
  - Open URL or DOI in browser
  - If resource is stored locally, PDF can be opened directly
  - For resources, a 'base' directory must be specified
+ - Open PDF resource directly via quick menu
 
 ### Concerning references
  - Preview of referenced label when hovering over `\ref{...}`

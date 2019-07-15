@@ -24,7 +24,7 @@ class CitetexAddResource(sublime_plugin.TextCommand):
             self.res_folder = proj_settings['settings']['resource_root']
             self.current_entry = self._bib_entry_list[index]
             self._res_file_list = [x for x in os.listdir(self.res_folder) if os.path.isfile(os.path.join(self.res_folder, x))]
-            print(self._res_file_list)
+            # print(self._res_file_list)
             self.view.window().show_quick_panel(self._res_file_list, self._insert_entry)
 
     def _insert_entry(self, index):
