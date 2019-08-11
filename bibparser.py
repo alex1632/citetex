@@ -8,11 +8,12 @@ class BibParser:
 
     def parse_bibfile(self, bibfile):
         # os.path.dirname(bibfile)
+        print("Triggered to parse bibfile {}".format(bibfile))
         data = dict()
         with open(bibfile, "r", encoding="utf-8") as bfile:
             content = bfile.read().split('\n')
             current_key = None
-
+            has_booktitle = False
             for entry in content:
                 match = self._type_key_re.match(entry)
                 if match:
@@ -28,7 +29,7 @@ class BibParser:
                     group_type = groups[0].lower()
                     if group_type == "url" or group_type == "doi" or group_type == "year":
                         data[current_key][group_type] = groups[1]
-                    elif (group_type == "title" or group_type == "booktitle") and 'title' not in data[current_key]:
+                    elif group_type == "title" or ((group_type == "booktitle") and 'title' not in data[current_key]):
                         data[current_key]["title"] = groups[1].replace('{', '').replace('}', '')
                     elif group_type == "author":
                         data[current_key]['author'] = groups[1].split(',')[0] # store only first author's last name
@@ -40,6 +41,7 @@ class BibParser:
                     groups = match.groups()
                     data[groups[0]]['resource'] = groups[2]
                     data[groups[0]]['resource_type'] = groups[1]
+
         return data
 
 
