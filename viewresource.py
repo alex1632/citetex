@@ -20,7 +20,7 @@ class CitetexViewResourcePdf(sublime_plugin.TextCommand):
 
         # menu_select = [["[{}] - {}".format(x['ref'], x['title']), "{}".format(x['resource'])] for x in self.entries]
         menu_select = [["{} {} - {}".format(x['author'], x['year'], x['title']), "{}".format(x['resource'])] for x in self.entries]
-        print(self.entries)
+        # print(self.entries)
         self.view.window().show_quick_panel(menu_select, self.handle_cb)
 
     def handle_cb(self, idx):

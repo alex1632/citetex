@@ -1,7 +1,7 @@
 import os
 import re
 
-class ReferenceFinder:
+class ReferenceHandler:
     def __init__(self):
         self.entries = list()
         self.rootdir = None
@@ -77,8 +77,9 @@ class ReferenceFinder:
             locale_dict = config_user["locales"][locale] if (config_user is not None and "locales" in config_user) else config_default["locales"][locale]
 
             abbrv = locale_dict[entry["type"]]
-            print(entry['label'])
-            return "{}~\\ref{{{}}}".format(abbrv, entry["label"])
+            # print(entry['type'])
+            eq_prefix = "eq" if entry['type'] else ""
+            return "{}~\\{}ref{{{}}}".format(abbrv, eq_prefix, entry["label"])
         except KeyError:
             print("Could not find definition for {} in locale {}".format(entry["type"], locale))
             return "\\ref{{{}}}".format(entry["label"])

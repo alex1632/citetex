@@ -5,9 +5,9 @@ import sublime_plugin
 import html
 import os
 from threading import Lock
-from . import ref_finder
+from . import ref_handler
 
-reference_server = ref_finder.ReferenceFinder()
+reference_server = ref_handler.ReferenceHandler()
 file_ref_loaded = None
 file_ref_mutex = Lock()
 
