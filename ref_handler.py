@@ -78,7 +78,7 @@ class ReferenceHandler:
 
             abbrv = locale_dict[entry["type"]]
             # print(entry['type'])
-            eq_prefix = "eq" if entry['type'] else ""
+            eq_prefix = "eq" if entry['type'] == "equation" else ""
             return "{}~\\{}ref{{{}}}".format(abbrv, eq_prefix, entry["label"])
         except KeyError:
             print("Could not find definition for {} in locale {}".format(entry["type"], locale))
