@@ -11,6 +11,7 @@ class ReferenceHandler:
         self._listing_re = re.compile(r"(?:.*?(caption|label)=(.*?)(?:,|\]))")
 
     def update_references(self, rootdir):
+        # called if selected tab belongs to a tex project and the former did not
         self.rootdir = rootdir
         self.entries = list()
 
@@ -23,11 +24,14 @@ class ReferenceHandler:
         self.find_labels(filename)
 
     def find_labels(self, filename):
+        # parse tex scopes such as figure, table...
         with open(filename, "r", encoding="utf-8") as texfile:
             content = texfile.read().split('\n')
 
-        typ, params, text = "", "", ""
-        for line in content:
+        params, text = "", ""
+        #handle nested scopes
+        typ = list()
+        for linenumber, line in enumerate(content):
             label = self._label_re.match(line)
             scope = self._scope_re.match(line)
             title = self._titles_re.match(line)
@@ -36,29 +40,39 @@ class ReferenceHandler:
             if scope:
                 context = scope.groups()[0]
                 proposed_type = scope.groups()[1]
-                if context == "begin" and proposed_type != 'minipage':
-                    typ = proposed_type
-                else:
-                    typ = ""
+                if context == "begin":
+                    typ.append(proposed_type)
+                elif context == "end":
+                    try:
+                        typ.pop(-1) # pop the scope added
+                    except IndexError:
+                        print("Empty scope {} at: {}:{}".format(context,filename, linenumber))
 
             elif title:
                 text = title.groups()[2]
                 # keep type of label if parsed string belongs to a scope (figure)
-                typ = title.groups()[1] if not title.groups()[1] == "caption" else typ
+                if not title.groups()[1] == "caption":
+                    typ.append(title.groups()[1])
                 params = title.groups()[0]
 
             if label:
                 l = label.groups()
-                self.entries.append({"filename": filename, "type": typ, "label": l[0], "text": text if typ != "equation" else "Equation: {}".format(l[0]), "params": params})
-                typ, params, text = "", "", ""
+                try:
+                    t = typ[-1]
+                    self.entries.append({"filename": filename, "type": t, "label": l[0], "text": text if t != "equation" else "{}".format(l[0]), "params": params})
+                except IndexError:
+                    # print("Empty list at: {} {} {}".format(filename, l[0], text))
+                    pass # happens if labels in commented scopes occur
+
+                params, text = "", ""
 
             if listing:
                 text = next(filter(lambda x: x[0] == "caption", listing), (None, None))[1]
                 label = next(filter(lambda x: x[0] == "label", listing), (None, None))[1]
-                self.entries.append({"filename": filename, "type": "listing", "label": label, "text": text, "params": ''})
-                typ, params, text = "", "", ""
+                self.entries.append({"filename": filename, "type": "Listing", "label": label, "text": text, "params": ''})
+                params, text = "", ""
 
-        # print(self.entries)
+
 
 
     def deliver_entries(self):
