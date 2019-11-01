@@ -27,12 +27,13 @@ class BibParser:
                 if match:
                     groups = match.groups()
                     group_type = groups[0].lower()
-                    if group_type == "url" or group_type == "doi" or group_type == "year":
+                    if group_type in ["url", "doi", "year", "address"]:
                         data[current_key][group_type] = groups[1]
                     elif group_type == "title" or ((group_type == "booktitle") and 'title' not in data[current_key]):
                         data[current_key]["title"] = groups[1].replace('{', '').replace('}', '')
                     elif group_type == "author":
                         data[current_key]['author'] = groups[1].split(',')[0] # store only first author's last name
+                        # data[current_key]['author'] = groups[1].split(' and ')
 
                     continue
 

@@ -22,8 +22,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
     bibman = bibmanager.BibManager()
     bibphan = bibphantoms.BibPhantomManager()
     tex_phan = texphantoms.TexPhantomManager()
-    LOAD_PENDING = None
-    mutex = Lock()
     current_properties = dict()
     current_path = None
 
@@ -47,6 +45,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
             info_content = ""
+            print(HoverCite.current_properties)
             if "ref" in HoverCite.current_properties:
                 info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
             if image_path:
@@ -70,12 +69,8 @@ class HoverCite(sublime_plugin.ViewEventListener):
         webbrowser_cmd = self._user_settings.get("webbrowser", self._default_settings.get("webbrowser"))
         if command == "gotobib":
             bib_view = self.view.window().open_file(HoverCite.current_properties["bibfile"])
-            if bib_view.is_loading():
-                with HoverCite.mutex:
-                    HoverCite.LOAD_PENDING = True
-            else:
-                marker = next(filter(lambda x: x[1] == HoverCite.current_properties['key'], bib_view.symbols()), None)[0]
-                bib_view.show_at_center(marker)
+            marker = next(filter(lambda x: x[1] == HoverCite.current_properties['key'], bib_view.symbols()), None)[0]
+            bib_view.show_at_center(marker)
 
         elif command == "viewurl":
             url = HoverCite.current_properties["url"]
@@ -95,14 +90,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
                 subprocess.Popen(open_command, shell=True)
 
 
-    def on_load_async(self):
-        # scoll to the first occurrence of the pending key to be displayed in the bibfile
-        with HoverCite.mutex:
-            if HoverCite.LOAD_PENDING and "text.biblatex" in self.view.scope_name(self.view.sel()[0].a).split():
-                self.view.show_at_center(next(filter(lambda x: x[1] == HoverCite.current_properties['key'], self.view.symbols()), None)[0])
-                HoverCite.LOAD_PENDING = None
-
-
     def on_activated_async(self):
         file_name = self.view.file_name()
         path_of_file = os.path.dirname(file_name) if file_name else None
@@ -110,6 +97,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
         if self.view.file_name() is not None and ("text.tex.latex" in scope.split() or self.view.file_name().endswith('.bib')):
             self.use_settings() # since we use settings, reload them
             if path_of_file != HoverCite.current_path: # if working directory has changed, reload bibfile and error phantoms
+                self.view.window().status_message("Load references...")
                 HoverCite.current_path = path_of_file
                 # adjust rendering style to project
                 project_data = self.view.window().project_data()
@@ -125,6 +113,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
                         HoverCite.bibphan.update_phantoms(self.view, self.errors[self.view.file_name()], self.view.symbols())
                     else:
                         HoverCite.bibphan.clear_phantoms()
+                self.view.window().status_message("Cite references loaded.")
 
             if self.view.file_name().endswith('.tex'): # always refresh title phantoms in tex files
                 self.refresh_tex_phantoms()

@@ -8,8 +8,6 @@ from threading import Lock
 from . import ref_handler
 
 reference_server = ref_handler.ReferenceHandler()
-file_ref_loaded = None
-file_ref_mutex = Lock()
 
 class RefFiller(sublime_plugin.ViewEventListener):
     def __init__(self, *args, **kwargs):
@@ -67,26 +65,6 @@ class RefFiller(sublime_plugin.ViewEventListener):
             print("Updating {}".format(self.view.file_name()))
             reference_server.update_file(self.view.file_name())
 
-class JumpListener(sublime_plugin.EventListener):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.view = None
-
-    def on_load_async(self, view):
-        '''
-        If referenced file, which should be displayed after request through popup is not loaded,
-        centering view on reference would fail if show_at center is called too early --> Use an EventListener
-        triggered on file load for this
-        '''
-        self.view = view
-        with file_ref_mutex:
-            global file_ref_loaded
-            if file_ref_loaded:
-                entry = reference_server.entries[file_ref_loaded]
-                region = next(filter(lambda x: x[1] == entry['label'], self.view.symbols()), (None, ))[0]
-                self.view.show_at_center(region.a)
-                file_ref_loaded = None
-
 
 
 class CitetexApplyRefCommand(sublime_plugin.TextCommand):
@@ -106,10 +84,5 @@ class CitetexGotoLabelCommand(sublime_plugin.WindowCommand):
     def on_apply_selection(self, sel):
         entry = reference_server.entries[sel]
         tex_view = self.window.open_file(entry["filename"])
-        if tex_view.is_loading():
-            with file_ref_mutex:
-                global file_ref_loaded
-                file_ref_loaded = sel
-        else:
-            tex_view.show_at_center(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0].a)
+        tex_view.show_at_center(next(filter(lambda x: x[1] == entry['label'], tex_view.symbols()), None)[0].a)
         
