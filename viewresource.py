@@ -30,5 +30,7 @@ class CitetexViewResourcePdf(sublime_plugin.TextCommand):
             if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
                 filepath = os.path.join(resource_dir['settings']['resource_root'], self.entries[idx]['resource'])
                 open_command = [self._user_settings.get(settings_property, self._default_settings.get(settings_property)), filepath]
-                #print(open_command)
-                subprocess.Popen(open_command, shell=True)
+                if sublime.platform() == 'windows':
+                    subprocess.Popen(open_command, shell=True)
+                else:
+                    subprocess.Popen(" ".join(open_command), shell=True)

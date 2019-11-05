@@ -2,7 +2,7 @@
 	"bib_errors": true,
 	"tex_phantoms": true,
 	"webbrowser": "firefox --new-tab",
-	"open_resource_pdf": "C:\\Program Files\\SumatraPDF\\SumatraPDF.exe",
+	"open_resource_pdf": "zathura",
 	
 	"references": {
 		"locale": "en",

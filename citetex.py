@@ -13,7 +13,7 @@ def plugin_loaded():
     except OSError:
         pass
 
-    HoverCite.bibman.set_cache_path(sublime.cache_path())
+    HoverCite.bibman.set_cache_path(os.path.join(sublime.cache_path(), "citetex"))
     print("CiteTex loaded")
 
 
@@ -86,8 +86,10 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
                 filepath = os.path.join(resource_dir['settings']['resource_root'], HoverCite.current_properties['resource'])
                 open_command = [self._user_settings.get(settings_property, self._default_settings.get(settings_property)), filepath]
-                print(open_command)
-                subprocess.Popen(open_command, shell=True)
+                if sublime.platform() == 'windows':
+                    subprocess.Popen(open_command, shell=True)
+                else:
+                    subprocess.Popen(" ".join(open_command), shell=True)
 
 
     def on_activated_async(self):
