@@ -1,11 +1,12 @@
 from threading import Lock
 import sublime
 import sublime_plugin
-import subprocess
+# import subprocess
 import os
 from . import bibmanager
 from . import bibphantoms
 from . import texcitephantoms as texphantoms
+from .utils import process_open
 
 def plugin_loaded():
     try:
@@ -44,7 +45,6 @@ class HoverCite(sublime_plugin.ViewEventListener):
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
             image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
-            print(image_path)
             info_content = ""
             if "ref" in HoverCite.current_properties:
                 info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
@@ -74,11 +74,11 @@ class HoverCite(sublime_plugin.ViewEventListener):
 
         elif command == "viewurl":
             url = HoverCite.current_properties["url"]
-            subprocess.Popen("{} {}".format(webbrowser_cmd, url), shell=True)
+            process_open("{} {}".format(webbrowser_cmd, url))
 
         elif command == "viewdoi":
             url = "http://dx.doi.org/" + HoverCite.current_properties["doi"]
-            subprocess.Popen("{} {}".format(webbrowser_cmd, url), shell=True)
+            process_open("{} {}".format(webbrowser_cmd, url))
 
         elif command == "viewres":
             settings_property = "open_resource_{}".format(HoverCite.current_properties['resource_type'].lower())
@@ -86,10 +86,11 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
                 filepath = os.path.join(resource_dir['settings']['resource_root'], HoverCite.current_properties['resource'])
                 open_command = [self._user_settings.get(settings_property, self._default_settings.get(settings_property)), filepath]
-                if sublime.platform() == 'windows':
-                    subprocess.Popen(open_command, shell=True)
-                else:
-                    subprocess.Popen(" ".join(open_command), shell=True)
+                process_open(open_command)
+                # if sublime.platform() == 'windows':
+                #     subprocess.Popen(open_command, shell=True)
+                # else:
+                #     subprocess.Popen(" ".join(open_command), shell=True)
 
 
     def on_activated_async(self):

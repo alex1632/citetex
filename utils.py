@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sublime
 
 def find_bibfiles(open_filename):
     try:
@@ -12,3 +14,18 @@ def find_bibfiles(open_filename):
         bibfiles = list()
 
     return bibfiles
+
+def process_open(command, stdin=None, stdout=None, stderr=None, cwd=None, env=None):
+    if sublime.platform() == "windows":
+        if isinstance(command, list):
+            proc = subprocess.Popen(command, env=env, stdin=stdin, stdout=stdout, stderr=stderr, cwd=cwd, shell=True)
+        else:
+            proc = subprocess.Popen(command.split(" "), env=env, stdin=stdin, stdout=stdout, stderr=stderr, cwd=cwd, shell=True)
+    else:
+        if isinstance(command, list):
+            proc = subprocess.Popen(" ".join(command), env=env, stdin=stdin, stdout=stdout, stderr=stderr, cwd=cwd, shell=True)
+        else:
+            proc = subprocess.Popen(command, env=env, stdin=stdin, stdout=stdout, stderr=stderr, cwd=cwd, shell=True)
+
+
+    return proc

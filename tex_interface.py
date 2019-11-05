@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 import subprocess
+from .utils import process_open
 import os
 import re
 
@@ -45,10 +46,10 @@ class TeXRenderer:
 
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)
-        tex_cmd = subprocess.Popen([self.texcommand], cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        tex_cmd = process_open([self.texcommand], cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         tex_cmd.communicate(input=document.encode())
         tex_cmd.wait()
-        subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "-o cite1.png", "texput.dvi"]), cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
+        process_open(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "-o cite1.png", "texput.dvi"], cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
 
         return os.path.join(self.cwd, "cite1.png")
 
@@ -59,11 +60,11 @@ class TeXRenderer:
         if (style + ".bst" in os.listdir(os.path.dirname(bibfile))):
             self._env["BSTINPUTS"] = os.path.dirname(bibfile)
 
-        print("bbl path is: " + os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"))
+        # print("bbl path is: " + os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"))
 
         with open(os.path.join(self.cwd, self.AUXFILE_PREFIX + ".aux"), "w") as caux:
             caux.write(aux_skeleton.format(style=style, bibl=bibfile.rstrip('.bib')))
-        bibtex_proc = subprocess.Popen("{} {}".format(self.bibinterface, self.AUXFILE_PREFIX + ".aux"), cwd=self.cwd, shell=True, stdout=subprocess.PIPE, env=self._env)
+        bibtex_proc = process_open("{} {}".format(self.bibinterface, self.AUXFILE_PREFIX + ".aux"), cwd=self.cwd, stdout=subprocess.PIPE, env=self._env)
         bibtex_stdout = bibtex_proc.communicate()
         errors = self.parse_bibtex_errors(bibtex_stdout[0].decode())
 
