@@ -45,10 +45,16 @@ class TeXRenderer:
 
     def render_tex(self, inputstr, dpi):
         document = tex_skeleton.format(inputstr)
-        tex_cmd = subprocess.Popen("{} -jobname cite".format(self.texcommand), cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        if sublime.platform() == 'windows':
+            tex_cmd = subprocess.Popen([self.texcommand], cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        else:
+            tex_cmd = subprocess.Popen([self.texcommand, "-jobname cite"], cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
         tex_cmd.communicate(input=document.encode())
         tex_cmd.wait()
-        subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "cite.dvi"]), cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
+        if sublime.platform() == 'windows':
+            subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "-o cite1.png", "texput.dvi"]), cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
+        else:
+            subprocess.Popen(" ".join(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "cite.dvi"]), cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
 
         return os.path.join(self.cwd, "cite1.png")
 
