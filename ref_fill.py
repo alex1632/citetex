@@ -9,27 +9,31 @@ from . import ref_handler
 
 reference_server = ref_handler.ReferenceHandler()
 
-class RefFiller(sublime_plugin.ViewEventListener):
+class CitetexInsertRef(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.region = None
         self.entry = None
 
 
-    def on_query_context(self, key, operator, operand, match_all):
+    def run(self, edit):
         '''
         Reference autocompletion trigger (ref)
         If no references are declared, ordinary word completion is performed
         '''
-        if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex") \
-            and operand == True and key == "bh_wrapping":
-            prefix = self.view.substr(self.view.word(self.view.sel()[0].b))
-            if prefix == "ref":
-                self.view.window().show_quick_panel(reference_server.deliver_entries(), self.on_apply_selection)
-                return False
+        
+        prefix = self.view.substr(self.view.word(self.view.sel()[0].b))
 
-            return None
-        return None
+        self.view.window().show_quick_panel(reference_server.deliver_entries(), self.on_apply_selection)
+        return False
+
+
+    def on_apply_selection(self, number):
+        if number != -1: # if selection is not aborted
+            self.view.run_command("citetex_apply_ref", {"number": number})     
+
+
+class RefEventListener(sublime_plugin.ViewEventListener):
 
     def on_hover(self, point, hover_zone):
         scopes = self.view.scope_name(point).split()
@@ -50,9 +54,6 @@ class RefFiller(sublime_plugin.ViewEventListener):
             tex_view.show(next(filter(lambda x: x[1] == self.entry['label'], tex_view.symbols()), (None, ))[0])
 
 
-    def on_apply_selection(self, number):
-        if number != -1: # if selection is not aborted
-            self.view.run_command("citetex_apply_ref", {"number": number})              
 
     def on_activated(self):
         if self.view.score_selector(self.view.sel()[0].b, "text.tex.latex"):
