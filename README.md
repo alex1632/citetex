@@ -64,17 +64,25 @@ While LaTeXTools provides a fairly helpful completion menu when inserting refere
 So far, this plugin has only been tested on the following operating systems:
 
  - Arch Linux
+ - Windows 10
 
 Testers on Mac and Windows are welcome! (I will not put too much effort in getting it to work under Windows, though.)
 
-## Dependencies
-This plugin relies on LaTeX and BibTeX for rendering and handling tex files. Specifically, `latex` and `dvipng` should be available in your `PATH`. Other than that, no special python packages or executables are required.
+### Windows
+On Windows, you must have MikTeX or similar installed and added to your PATH. Serveral packages may have to be installed in MikTeX (use its Package Manager).
+
+In the `Citetex-default.sublime-settings` file, change `open_resource_pdf` to "C:\\Program Files\\ your PDF READER.exe",
+
+### Dependencies
+This plugin relies on LaTeX and BibTeX for rendering and handling tex files. Specifically, `latex` and `dvipng` should be available in your `PATH` (executables are included in TeX packages normally). 
+
+For proper biblatex support, the `LaTeXTools` sublime package is required (provides the Biblatex syntax scheme in Sublime).
 
 ## Temporary files
 CiteTeX uses a subfolder of the sublime text cache folder.
 
 ## Known issues
-It may take while to index all entries and provide renderings for the popups when Sublime Text is started. 
+It may take while to index all entries and provide renderings for the popups when Sublime Text is started. On windows, cite preview rendering is slow.
 
 # Questions?
 Send me an e-mail: afk (at) daichronos (dot) net

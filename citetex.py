@@ -84,9 +84,9 @@ class HoverCite(sublime_plugin.ViewEventListener):
             settings_property = "open_resource_{}".format(HoverCite.current_properties['resource_type'].lower())
             resource_dir = self.view.window().project_data() or {}
             if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
-                open_command = self._user_settings.get(settings_property, self._default_settings.get(settings_property)) + " {file}"
-                open_command = open_command.format(file=os.path.join(resource_dir['settings']['resource_root'], HoverCite.current_properties['resource']))
-                #print(open_command)
+                filepath = os.path.join(resource_dir['settings']['resource_root'], HoverCite.current_properties['resource'])
+                open_command = [self._user_settings.get(settings_property, self._default_settings.get(settings_property)), filepath]
+                print(open_command)
                 subprocess.Popen(open_command, shell=True)
 
 
