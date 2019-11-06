@@ -63,12 +63,13 @@ class BibManager:
 
         return errors
 
-    def serve_entry(self, key):
+    def serve_entry(self, key, render=True):
         properties = dict()
         image_path = None
         for bib in self.bib_entries:
             if key in self.bib_entries[bib]:
-                image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
+                if render:
+                    image_path = self.tex_interface.render_tex(self.bib_entries[bib][key]['block'], 150)
                 properties = self.bib_entries[bib][key]
                 properties["key"] = key
                 properties["bibfile"] = bib

@@ -3,6 +3,8 @@
 	"tex_phantoms": true,
 	"webbrowser": "firefox --new-tab",
 	"open_resource_pdf": "zathura",
+	// "open_resource_pdf": "C:\\Program Files\\SumatraPDF\\SumatraPDF.exe",
+	"show_rendered_citation": true,
 	
 	"references": {
 		"locale": "en",
@@ -18,6 +20,7 @@
 			},
 			"en": {
 				"figure": "Fig.",
+				"subfigure": "Fig.",
 				"table": "Tab.",
 				"section": "Sec.",
 				"chapter": "Ch.",

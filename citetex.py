@@ -44,12 +44,20 @@ class HoverCite(sublime_plugin.ViewEventListener):
         if 'text.tex.latex' in scopes and 'constant.other.citation.latex' in scopes:
             # print(self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},')))
             cite_key = self.view.substr(self.view.expand_by_class(point, sublime.CLASS_WORD_END | sublime.CLASS_WORD_START, '\{\},'))
-            image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key)
+            image_path, HoverCite.current_properties = HoverCite.bibman.serve_entry(cite_key, render=self._user_settings.get("show_rendered_citation", self._default_settings.get("show_rendered_citation")))
             info_content = ""
             if "ref" in HoverCite.current_properties:
-                info_content += "<h3>[{}]</h3>\n".format(HoverCite.current_properties["ref"])
+                info_content += "<h3>[{}]".format(HoverCite.current_properties["ref"])
+                if not image_path:
+                    info_content += """ - {} """.format(HoverCite.current_properties['author'])
+
+                info_content += """</h3>\n"""
+
             if image_path:
                 info_content += """<p><img src="file://{}"></p>\n""".format(image_path)
+            else:
+                info_content += """<p> {}, {} </p>\n""".format(HoverCite.current_properties['title'], HoverCite.current_properties['year'])
+                info_content += """<p> {} - {} </p>\n""".format(HoverCite.current_properties.get('publisher',""), HoverCite.current_properties.get('address', ''))
 
             info_content += """<a href="gotobib">BibTeX entry</a>"""
 
