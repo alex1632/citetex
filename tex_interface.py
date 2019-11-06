@@ -49,7 +49,7 @@ class TeXRenderer:
         tex_cmd = process_open([self.texcommand], cwd=self.cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         tex_cmd.communicate(input=document.encode())
         tex_cmd.wait()
-        process_open(["dvipng", "-D", str(dpi), "-bg Transparent", "-fg White", "-o cite1.png", "texput.dvi"], cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
+        process_open(["dvipng", "-D", str(dpi), "-bg", "Transparent", "-fg", "White", "-o", "cite1.png", "texput.dvi"], cwd=self.cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
 
         return os.path.join(self.cwd, "cite1.png")
 

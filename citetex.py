@@ -86,6 +86,7 @@ class HoverCite(sublime_plugin.ViewEventListener):
             if "settings" in resource_dir and "resource_root" in resource_dir['settings']:
                 filepath = os.path.join(resource_dir['settings']['resource_root'], HoverCite.current_properties['resource'])
                 open_command = [self._user_settings.get(settings_property, self._default_settings.get(settings_property)), filepath]
+                print(open_command)
                 process_open(open_command)
                 # if sublime.platform() == 'windows':
                 #     subprocess.Popen(open_command, shell=True)
